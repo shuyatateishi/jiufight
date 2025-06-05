@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アナウンス - Super Yawara Cup 2025</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="announcements.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Super Yawara Cup 2025</h1>
+                <button class="mobile-menu-toggle" aria-label="メニュー">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="tournament.html">大会情報</a></li>
+                    <li><a href="announcements.html" class="active">アナウンス</a></li>
+                    <li><a href="fighters.html">選手一覧</a></li>
+                    <li><a href="rankings.html">ランキング</a></li>
+                    <li><a href="admin.html">管理者</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="announcements-section">
+            <div class="container">
+                <h2 class="section-title">大会アナウンス</h2>
+                
+                <!-- Match Progress Display -->
+                <div class="match-progress-display">
+                    <div class="current-match-info">
+                        <span class="match-status">現在: <span id="current-match-number">1</span>試合目</span>
+                        <span class="total-matches">（全18試合中）</span>
+                    </div>
+                    <div class="current-match-details">
+                        <span id="current-match-detail">待機中</span>
+                    </div>
+                </div>
+                
+                <div class="announcement-controls">
+                    <button id="refresh-btn" class="control-btn">
+                        更新
+                    </button>
+                    <div class="auto-refresh">
+                        <input type="checkbox" id="auto-refresh" checked>
+                        <label for="auto-refresh">自動更新（30秒）</label>
+                    </div>
+                </div>
+
+                <div class="announcements-container">
+                    <!-- 計量呼び出し -->
+                    <div class="announcement-card weigh-in">
+                        <h3>計量呼び出し</h3>
+                        <div id="weigh-in-list" class="announcement-list">
+                            <div class="announcement-item urgent">
+                                <span class="time">8:30</span>
+                                <span class="category">青帯 -70kg級</span>
+                                <span class="message">山田太郎選手、佐藤次郎選手は計量場所へお越しください</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 試合呼び出し -->
+                    <div class="announcement-card match-call">
+                        <h3>試合呼び出し</h3>
+                        <div id="match-call-list" class="announcement-list">
+                            <div class="announcement-item">
+                                <span class="time">9:45</span>
+                                <span class="mat">マットA</span>
+                                <span class="message">紫帯 -85kg級 準決勝: 鈴木三郎選手 vs 田中四郎選手</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 表彰式 -->
+                    <div class="announcement-card awards">
+                        <h3>表彰式</h3>
+                        <div id="awards-list" class="announcement-list">
+                            <div class="announcement-item">
+                                <span class="time">16:30</span>
+                                <span class="category">白帯 -60kg級</span>
+                                <span class="message">表彰式を行います。入賞者は表彰台へお越しください</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 一般アナウンス -->
+                    <div class="announcement-card general">
+                        <h3>お知らせ</h3>
+                        <div id="general-list" class="announcement-list">
+                            <div class="announcement-item info">
+                                <span class="time">12:00</span>
+                                <span class="message">昼休憩に入ります。午後の部は13:00より開始します</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 音声アナウンス -->
+                <div class="audio-announcement">
+                    <h3>音声アナウンス</h3>
+                    <div class="audio-controls">
+                        <button id="audio-toggle" class="audio-btn">
+                            音声ON
+                        </button>
+                        <input type="range" id="volume-control" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Super Yawara Cup. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="announcements.js"></script>
+</body>
+</html>

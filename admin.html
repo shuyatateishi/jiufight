@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者 - Jiufight</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-section {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .admin-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .admin-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .admin-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .match-progress {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .current-match {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .match-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        .announcement-form {
+            margin-top: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .announcement-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        
+        .announcement-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+        
+        .announcement-content {
+            flex: 1;
+        }
+        
+        .announcement-time {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .announcement-text {
+            font-weight: 500;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Super Yawara Cup 2025</h1>
+                <button class="mobile-menu-toggle" aria-label="メニュー">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="tournament.html">大会情報</a></li>
+                    <li><a href="announcements.html">アナウンス</a></li>
+                    <li><a href="fighters.html">選手一覧</a></li>
+                    <li><a href="rankings.html">ランキング</a></li>
+                    <li><a href="admin.html" class="active">管理者</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <div class="admin-container">
+                <h2 class="section-title">管理者ページ</h2>
+                
+                <div class="admin-panel">
+                    <!-- 試合進行管理 -->
+                    <div class="admin-card">
+                        <h3>試合進行管理</h3>
+                        <div class="match-progress">
+                            <div class="progress-info">
+                                <div>
+                                    <div class="current-match">現在: <span id="current-match-display">1試合目</span></div>
+                                    <div>全<span id="total-matches">18</span>試合中</div>
+                                </div>
+                                <div class="match-controls">
+                                    <button class="btn btn-secondary" onclick="previousMatch()">前の試合</button>
+                                    <button class="btn btn-primary" onclick="nextMatch()">次の試合</button>
+                                </div>
+                            </div>
+                            <div>
+                                <strong>現在の試合:</strong> <span id="current-match-info">待機中</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アナウンス管理 -->
+                    <div class="admin-card">
+                        <h3>アナウンス管理</h3>
+                        <form class="announcement-form" onsubmit="addAnnouncement(event)">
+                            <div class="form-group">
+                                <label for="announcement-type">アナウンス種類</label>
+                                <select id="announcement-type">
+                                    <option value="general">一般アナウンス</option>
+                                    <option value="match-call">試合呼び出し</option>
+                                    <option value="weigh-in">計量呼び出し</option>
+                                    <option value="awards">表彰関連</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="announcement-text">アナウンス内容</label>
+                                <textarea id="announcement-text" placeholder="アナウンスする内容を入力してください" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">アナウンスを追加</button>
+                        </form>
+                        
+                        <div class="announcement-list" id="announcement-list">
+                            <!-- アナウンス一覧が表示されます -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Jiufight. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // 試合進行管理
+        let currentMatchNumber = 1;
+        const totalMatches = 18; // 個人戦 + 団体戦
+        
+        const matches = [
+            '待機中',
+            '巨人なるガラ vs ドクターオーパスワンやなちゃん',
+            'Yawaraのヤングボーイぬっきー vs 焼肉古今の司令塔ばばちゃん',
+            'HONDAの開発番長コウシ vs 華麗なる新人鈴木',
+            '体幹お兄さん直人 vs インテリジェンステイクダウンリュウヒ',
+            'いにしえのドリーマー宮本 vs 練習２ポケ本番キングスタッキー',
+            'シーシャボーイつくね vs 小島家のイケメン長男ケイタ',
+            'Yawaraのジローラモ古庫 vs 浪速のキムラロックシャイボーイ野田',
+            'スマイリー岡島 vs マナウスのくちばしアームロック',
+            'タクシー運転手の採用はお任せ！テツ vs インテリジェンステイクダウンリュウヒ',
+            // 柔術団体戦
+            '関原翔 vs 治療家の破壊王河野',
+            '山本歩夢 vs フェニックススイープ白木',
+            'ガブリエル vs シーシャ好きの柔道ファイターよしき',
+            '千原右京 vs 柔術ポーカーフェイス関',
+            '宮澤雄大 vs スピードスター喜一',
+            'きんじ vs 慶應出身エリート弁護士メーン上田',
+            '羽場内 vs エンジニア黒帯西尾',
+            '大竹 vs トゥータイムスチャンピオン野島',
+            '原田さん（黒帯）vs 小島家のイケメン次男ユウジ'
+        ];
+
+        // アナウンスデータ
+        let announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+
+        function updateMatchDisplay() {
+            document.getElementById('current-match-display').textContent = `${currentMatchNumber}試合目`;
+            document.getElementById('total-matches').textContent = totalMatches;
+            document.getElementById('current-match-info').textContent = matches[currentMatchNumber - 1] || '不明';
+            
+            // localStorageに保存
+            localStorage.setItem('currentMatch', currentMatchNumber);
+        }
+
+        function nextMatch() {
+            if (currentMatchNumber < totalMatches) {
+                currentMatchNumber++;
+                updateMatchDisplay();
+            }
+        }
+
+        function previousMatch() {
+            if (currentMatchNumber > 1) {
+                currentMatchNumber--;
+                updateMatchDisplay();
+            }
+        }
+
+        function addAnnouncement(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('announcement-type').value;
+            const text = document.getElementById('announcement-text').value;
+            const now = new Date();
+            
+            const announcement = {
+                id: Date.now(),
+                type: type,
+                text: text,
+                time: now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: now.getTime()
+            };
+            
+            announcements.unshift(announcement);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            document.getElementById('announcement-text').value = '';
+            displayAnnouncements();
+        }
+
+        function deleteAnnouncement(id) {
+            announcements = announcements.filter(a => a.id !== id);
+            localStorage.setItem('announcements', JSON.stringify(announcements));
+            displayAnnouncements();
+        }
+
+        function displayAnnouncements() {
+            const container = document.getElementById('announcement-list');
+            
+            if (announcements.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">アナウンスはありません</p>';
+                return;
+            }
+            
+            container.innerHTML = announcements.map(announcement => `
+                <div class="announcement-item">
+                    <div class="announcement-content">
+                        <div class="announcement-time">${announcement.time} - ${getTypeName(announcement.type)}</div>
+                        <div class="announcement-text">${announcement.text}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteAnnouncement(${announcement.id})">削除</button>
+                </div>
+            `).join('');
+        }
+
+        function getTypeName(type) {
+            const typeNames = {
+                'general': '一般',
+                'match-call': '試合呼び出し',
+                'weigh-in': '計量呼び出し',
+                'awards': '表彰'
+            };
+            return typeNames[type] || type;
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 保存された試合番号を読み込み
+            const savedMatch = localStorage.getItem('currentMatch');
+            if (savedMatch) {
+                currentMatchNumber = parseInt(savedMatch);
+            }
+            
+            updateMatchDisplay();
+            displayAnnouncements();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大会情報 - Jiufight</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tournament-section {
+            padding: 2rem 0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .tournament-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .tournament-date {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        
+        .tournament-title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .tournament-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        
+        .schedule-section {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .schedule-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+        }
+        
+        .schedule-time {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .schedule-event {
+            color: var(--text-color);
+        }
+        
+        /* Compact Info Container */
+        .info-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .compact {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .compact .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        /* Compact Schedule */
+        .schedule-list {
+            font-size: 0.9rem;
+        }
+        
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .schedule-row:last-child {
+            border-bottom: none;
+        }
+        
+        .schedule-row.highlight {
+            background-color: #fff3cd;
+            padding: 0.4rem 0.5rem;
+            margin: 0 -0.5rem;
+            font-weight: 600;
+        }
+        
+        .schedule-row .time {
+            color: var(--primary-color);
+            font-weight: 600;
+            min-width: 50px;
+        }
+        
+        /* Compact Venue */
+        .venue-content {
+            font-size: 0.9rem;
+        }
+        
+        .venue-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.3rem;
+        }
+        
+        .venue-address {
+            margin-bottom: 0.8rem;
+            color: #666;
+        }
+        
+        .access-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        
+        .access-item {
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        .access-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+        
+        /* Ticket Section */
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .ticket-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #eee;
+            transition: var(--transition);
+        }
+        
+        .ticket-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .ticket-item.vip {
+            border-color: #FFD700;
+            background-color: #fffdf0;
+        }
+        
+        .ticket-item.reserved {
+            border-color: var(--primary-color);
+        }
+        
+        .ticket-type {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        
+        .ticket-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.3rem;
+        }
+        
+        .ticket-benefit {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .match-tables {
+            margin-bottom: 3rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .tab-btn {
+            background-color: var(--white);
+            border: 2px solid #ddd;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        
+        .tab-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .match-table-container {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+        
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .match-table th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .match-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .match-table tr:hover {
+            background-color: var(--bg-color);
+        }
+        
+        .fighter-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .match-time {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .notes-section {
+            background-color: #fff3cd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 3rem;
+        }
+        
+        .notes-section h3 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+        
+        .notes-section ul {
+            color: #856404;
+            margin-left: 1.5rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 968px) {
+            .info-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .ticket-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            
+            .ticket-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.8rem 1rem;
+            }
+            
+            .ticket-type {
+                margin-bottom: 0;
+            }
+            
+            .ticket-price {
+                font-size: 1.1rem;
+                margin-bottom: 0;
+            }
+            
+            .ticket-benefit {
+                margin-left: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .tab-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Super Yawara Cup 2025</h1>
+                <button class="mobile-menu-toggle" aria-label="メニュー">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul class="nav-menu">
+                    <li><a href="index.html">ホーム</a></li>
+                    <li><a href="tournament.html" class="active">大会情報</a></li>
+                    <li><a href="announcements.html">アナウンス</a></li>
+                    <li><a href="fighters.html">選手一覧</a></li>
+                    <li><a href="rankings.html">ランキング</a></li>
+                    <li><a href="admin.html">管理者</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="tournament-section">
+            <div class="container">
+                <a href="index.html" class="back-link">← ホームに戻る</a>
+                
+                <div class="tournament-header">
+                    <p class="tournament-date">2025年6月7日（土）開催決定！</p>
+                    <h1 class="tournament-title">第2回 Super Yawara Cup</h1>
+                    <p class="tournament-subtitle">ブラジリアン柔術の熱い戦いが再び！個人戦と柔術団体戦で頂点を目指せ！</p>
+                </div>
+
+                <div class="info-container">
+                    <div class="schedule-section compact">
+                        <h2 class="section-title">大会スケジュール</h2>
+                        <div class="schedule-list">
+                            <div class="schedule-row">
+                                <span class="time">9:00</span><span class="event">選手到着・計量</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="time">9:30</span><span class="event">開場（観客入場）</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="time">10:00</span><span class="event">開会セレモニー</span>
+                            </div>
+                            <div class="schedule-row highlight">
+                                <span class="time">10:30</span><span class="event">個人戦（9試合）</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="time">12:00</span><span class="event">バックコントロールチャレンジ</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="time">12:15</span><span class="event">昼休憩</span>
+                            </div>
+                            <div class="schedule-row highlight">
+                                <span class="time">12:45</span><span class="event">団体戦（9試合）</span>
+                            </div>
+                            <div class="schedule-row">
+                                <span class="time">14:35</span><span class="event">表彰・閉会式</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="venue-access-section compact">
+                        <h2 class="section-title">会場・アクセス</h2>
+                        <div class="venue-content">
+                            <div class="venue-name">GENスポーツパレス</div>
+                            <div class="venue-address">東京都新宿区百人町2-23-25</div>
+                            <div class="access-items">
+                                <span class="access-item">JR総武線「大久保」北口徒歩5分</span>
+                                <span class="access-item">JR山手線「新大久保」徒歩8分</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-section compact">
+                        <h2 class="section-title">チケット情報</h2>
+                        <div class="ticket-grid">
+                            <div class="ticket-item vip">
+                                <div class="ticket-type">VIP席</div>
+                                <div class="ticket-price">¥15,000</div>
+                                <div class="ticket-benefit">最前列・特典付き</div>
+                            </div>
+                            <div class="ticket-item reserved">
+                                <div class="ticket-type">指定席</div>
+                                <div class="ticket-price">¥10,000</div>
+                                <div class="ticket-benefit">座席指定</div>
+                            </div>
+                            <div class="ticket-item general">
+                                <div class="ticket-type">自由席</div>
+                                <div class="ticket-price">¥6,000</div>
+                                <div class="ticket-benefit">当日先着順</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="match-tables">
+                    <h2 class="section-title">対戦表</h2>
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="showTab('individual')">Super Yawara Cup</button>
+                        <button class="tab-btn" onclick="showTab('team')">柔術団体戦</button>
+                    </div>
+
+                    <div id="individual" class="tab-content active">
+                        <div class="match-table-container">
+                            <h3>Super Yawara Cup（個人戦）</h3>
+                            <table class="match-table">
+                                <thead>
+                                    <tr>
+                                        <th>時刻</th>
+                                        <th>赤コーナー</th>
+                                        <th>青コーナー</th>
+                                        <th>試合時間</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="match-time">10:30</td>
+                                        <td class="fighter-name">巨人なるガラ</td>
+                                        <td class="fighter-name">ドクターオーパスワンやなちゃん</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">10:42</td>
+                                        <td class="fighter-name">Yawaraのヤングボーイぬっきー</td>
+                                        <td class="fighter-name">焼肉古今の司令塔ばばちゃん</td>
+                                        <td>3分×1R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">10:49</td>
+                                        <td class="fighter-name">HONDAの開発番長コウシ</td>
+                                        <td class="fighter-name">華麗なる新人鈴木</td>
+                                        <td>3分×1R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">10:56</td>
+                                        <td class="fighter-name">体幹お兄さん直人</td>
+                                        <td class="fighter-name">インテリジェンステイクダウンリュウヒ</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">11:08</td>
+                                        <td class="fighter-name">いにしえのドリーマー宮本</td>
+                                        <td class="fighter-name">練習２ポケ本番キングスタッキー</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">11:20</td>
+                                        <td class="fighter-name">シーシャボーイつくね</td>
+                                        <td class="fighter-name">小島家のイケメン長男ケイタ</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">11:32</td>
+                                        <td class="fighter-name">Yawaraのジローラモ古庫</td>
+                                        <td class="fighter-name">浪速のキムラロックシャイボーイ野田</td>
+                                        <td>3分×1R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">11:39</td>
+                                        <td class="fighter-name">スマイリー岡島</td>
+                                        <td class="fighter-name">マナウスのくちばしアームロック</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">11:51</td>
+                                        <td class="fighter-name">タクシー運転手の採用はお任せ！テツ</td>
+                                        <td class="fighter-name">インテリジェンステイクダウンリュウヒ</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="team" class="tab-content">
+                        <div class="match-table-container">
+                            <h3>柔術団体戦</h3>
+                            <table class="match-table">
+                                <thead>
+                                    <tr>
+                                        <th>時刻</th>
+                                        <th>赤コーナー</th>
+                                        <th>青コーナー</th>
+                                        <th>試合時間</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="match-time">12:45</td>
+                                        <td class="fighter-name">関原翔</td>
+                                        <td class="fighter-name">治療家の破壊王河野</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">12:57</td>
+                                        <td class="fighter-name">山本歩夢</td>
+                                        <td class="fighter-name">フェニックススイープ白木</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">13:09</td>
+                                        <td class="fighter-name">ガブリエル</td>
+                                        <td class="fighter-name">シーシャ好きの柔道ファイターよしき</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">13:21</td>
+                                        <td class="fighter-name">千原右京</td>
+                                        <td class="fighter-name">柔術ポーカーフェイス関</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">13:33</td>
+                                        <td class="fighter-name">宮澤雄大</td>
+                                        <td class="fighter-name">スピードスター喜一</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">13:45</td>
+                                        <td class="fighter-name">きんじ</td>
+                                        <td class="fighter-name">慶應出身エリート弁護士メーン上田</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">13:57</td>
+                                        <td class="fighter-name">羽場内</td>
+                                        <td class="fighter-name">エンジニア黒帯西尾</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">14:09</td>
+                                        <td class="fighter-name">大竹</td>
+                                        <td class="fighter-name">トゥータイムスチャンピオン野島</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="match-time">14:21</td>
+                                        <td class="fighter-name">原田さん（黒帯）</td>
+                                        <td class="fighter-name">小島家のイケメン次男ユウジ</td>
+                                        <td>2分×3R</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notes-section">
+                    <h3>注意事項</h3>
+                    <ul>
+                        <li>スケジュールは進行状況により変更になる場合があります</li>
+                        <li>観客の皆様は9:30より入場可能です</li>
+                        <li>会場内での撮影・録画については大会規則に従ってください</li>
+                        <li>選手名をクリックするとプロフィールを確認できます</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Jiufight. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="tournament-fighters.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
