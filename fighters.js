@@ -19,6 +19,19 @@ function loadSavedData() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // CRITICAL: Force close all modals IMMEDIATELY on page load
+    setTimeout(() => {
+        const modals = ['fighter-modal', 'edit-modal', 'add-fighter-modal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                console.log(`🚨 FORCED CLOSE: ${modalId}`);
+            }
+        });
+    }, 100);
+    
     initializeEventListeners();
     loadFightersData();
     // loadSavedData is called inside loadFightersData to ensure proper data merging
@@ -32,6 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         displayFighters();
     }
+    
+    // ADDITIONAL SAFETY: Force close modals again after 1 second
+    setTimeout(() => {
+        const modals = ['fighter-modal', 'edit-modal', 'add-fighter-modal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && (modal.style.display === 'block' || modal.style.display === 'flex' || modal.classList.contains('show'))) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                console.log(`🚨 SAFETY CLOSE: ${modalId} was unexpectedly open`);
+            }
+        });
+    }, 1000);
 });
 
 // Event listeners
@@ -47,13 +73,16 @@ function initializeEventListeners() {
     // Modal close buttons
     document.querySelectorAll('.close').forEach(btn => {
         btn.addEventListener('click', function() {
-            this.closest('.modal').style.display = 'none';
+            const modal = this.closest('.modal');
+            modal.classList.remove('show');
+            modal.style.display = 'none';
         });
     });
     
     // Close modal on outside click
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
+            e.target.classList.remove('show');
             e.target.style.display = 'none';
         }
     });
@@ -67,7 +96,9 @@ function initializeEventListeners() {
     // Cancel buttons
     document.querySelectorAll('.cancel-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            this.closest('.modal').style.display = 'none';
+            const modal = this.closest('.modal');
+            modal.classList.remove('show');
+            modal.style.display = 'none';
         });
     });
 }
@@ -1335,7 +1366,9 @@ function showFighterProfile(fighterId) {
     `;
     
     document.getElementById('fighter-profile').innerHTML = profileHtml;
-    document.getElementById('fighter-modal').style.display = 'block';
+    const modal = document.getElementById('fighter-modal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
 }
 
 // Show edit form
@@ -1348,8 +1381,15 @@ function showEditForm(fighterId) {
     
     console.log(`Editing fighter: ${fighter.name} (ID: ${fighter.id})`);
     
-    document.getElementById('fighter-modal').style.display = 'none';
-    document.getElementById('edit-modal').style.display = 'block';
+    // Close fighter modal
+    const fighterModal = document.getElementById('fighter-modal');
+    fighterModal.classList.remove('show');
+    fighterModal.style.display = 'none';
+    
+    // Show edit modal
+    const editModal = document.getElementById('edit-modal');
+    editModal.classList.add('show');
+    editModal.style.display = 'flex';
     
     // Clear form first
     document.getElementById('edit-form').reset();
@@ -1536,7 +1576,9 @@ function handleEditSubmit(e) {
         }
         
         // Close modal IMMEDIATELY
-        document.getElementById('edit-modal').style.display = 'none';
+        const editModal = document.getElementById('edit-modal');
+        editModal.classList.remove('show');
+        editModal.style.display = 'none';
         if (window.debugFighters) {
             window.debugFighters.log('🎭 Edit modal closed', 'info');
         }
@@ -1597,7 +1639,9 @@ function calculateWinRate(wins, losses) {
 
 // Show add fighter modal
 function showAddFighterModal() {
-    document.getElementById('add-fighter-modal').style.display = 'block';
+    const modal = document.getElementById('add-fighter-modal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
     
     // Clear form
     document.getElementById('add-fighter-form').reset();
@@ -1663,7 +1707,9 @@ function handleAddFighterSubmit(e) {
     }
     
     // Close modal and refresh display
-    document.getElementById('add-fighter-modal').style.display = 'none';
+    const addModal = document.getElementById('add-fighter-modal');
+    addModal.classList.remove('show');
+    addModal.style.display = 'none';
     displayFighters();
     
     // Show success message

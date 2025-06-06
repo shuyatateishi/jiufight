@@ -401,11 +401,16 @@ main {
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    display: flex;
+    display: none !important; /* FORCE HIDDEN BY DEFAULT */
     align-items: center;
     justify-content: center;
     padding: var(--space-lg);
     box-sizing: border-box;
+}
+
+/* Modal show state - only when explicitly shown */
+.modal.show {
+    display: flex !important;
 }
 
 .modal-content {
