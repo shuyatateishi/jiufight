@@ -32,12 +32,25 @@ class DatabaseSync {
         return deviceId;
     }
     
-    // Initialize Firebase database connection
+    // Initialize Firebase database connection (Vercel optimized)
     async initializeDatabase() {
         try {
-            // Check if Firebase is loaded
-            if (typeof firebase === 'undefined' || !window.firebaseDB) {
-                console.warn('⚠️ Firebase not loaded, falling back to localStorage');
+            // Wait for Firebase to be fully loaded (important for Vercel deployment)
+            if (typeof firebase === 'undefined') {
+                console.warn('⚠️ Firebase SDK not loaded, falling back to localStorage');
+                this.useFallbackMode();
+                return;
+            }
+
+            // Wait a bit for Firebase to initialize in case of slow networks
+            let attempts = 0;
+            while (!window.firebaseDB && attempts < 10) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                attempts++;
+            }
+
+            if (!window.firebaseDB) {
+                console.warn('⚠️ Firebase database not initialized, falling back to localStorage');
                 this.useFallbackMode();
                 return;
             }
