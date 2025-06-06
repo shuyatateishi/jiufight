@@ -16,6 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMatchProgress();
     loadAnnouncements();
     startAutoRefresh();
+    
+    // Initialize real-time sync listeners
+    if (window.realtimeSync) {
+        window.realtimeSync.onAnnouncementUpdate((announcements) => {
+            loadAnnouncements();
+        });
+        
+        window.realtimeSync.onMatchUpdate((matchNumber) => {
+            loadMatchProgress();
+        });
+    }
 });
 
 // Event listeners

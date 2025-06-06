@@ -1379,8 +1379,12 @@ function handleEditSubmit(e) {
         fighter.name = updatedFullName;
     }
     
-    // Save to localStorage
-    localStorage.setItem('fightersData', JSON.stringify(fightersData));
+    // Save to localStorage with real-time sync
+    if (window.realtimeSync) {
+        window.realtimeSync.updateFighters(fightersData);
+    } else {
+        localStorage.setItem('fightersData', JSON.stringify(fightersData));
+    }
     
     // Close modal and refresh display
     document.getElementById('edit-modal').style.display = 'none';

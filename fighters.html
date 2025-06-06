@@ -3,9 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>選手一覧 - Super Yawara Cup 2025</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="fighters.css">
+    <title>🥊 選手一覧 - Super Yawara Cup 2025 | 全49名の出場選手プロフィール</title>
+    <meta name="description" content="第2回 Super Yawara Cup 2025に出場する全49名の選手プロフィール。白帯から黒帯まで、各階級のトップファイターたちの詳細情報をチェック！">
+    <meta name="keywords" content="柔術選手,BJJ選手,ファイタープロフィール,階級別,帯別,YAWARA柔術アカデミー,FHR">
+    
+    <!-- OGP Meta Tags -->
+    <meta property="og:title" content="🥊 選手一覧 - Super Yawara Cup 2025">
+    <meta property="og:description" content="全49名の出場選手プロフィール。白帯から黒帯まで、各階級のトップファイターたちの情報を詳しく紹介！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jiufight.com/fighters.html">
+    <meta property="og:site_name" content="Jiufight">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="🥊 選手一覧 - Super Yawara Cup 2025">
+    <meta name="twitter:description" content="全49名の出場選手プロフィール公開中！各選手の詳細情報をチェック">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
+    
+    <link rel="stylesheet" href="styles-v2.css">
+    <link rel="stylesheet" href="fighters-v2.css">
 </head>
 <body>
     <header>
@@ -142,6 +160,18 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="realtime-sync.js"></script>
     <script src="fighters.js"></script>
+    <script>
+        // Initialize real-time sync for fighters
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.realtimeSync) {
+                window.realtimeSync.onFighterUpdate((updatedFightersData) => {
+                    fightersData = updatedFightersData;
+                    displayFighters();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

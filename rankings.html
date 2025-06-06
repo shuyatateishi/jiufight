@@ -3,9 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Yawara Cup ランキング - Jiufight</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="rankings.css">
+    <title>🏆 ランキング - Super Yawara Cup 2025 | 階級別選手ランキング</title>
+    <meta name="description" content="Super Yawara Cup 2025の階級別選手ランキング。ルースター級からミディアムヘビー級まで、各階級のトップランカーを紹介。">
+    <meta name="keywords" content="柔術ランキング,階級別ランキング,BJJランキング,ルースター級,フェザー級,ライト級,ミドル級">
+    
+    <!-- OGP Meta Tags -->
+    <meta property="og:title" content="🏆 ランキング - Super Yawara Cup 2025">
+    <meta property="og:description" content="階級別選手ランキング公開中！各階級のトップランカーと注目選手をチェック">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jiufight.com/rankings.html">
+    <meta property="og:site_name" content="Jiufight">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="🏆 ランキング - Super Yawara Cup 2025">
+    <meta name="twitter:description" content="階級別選手ランキング発表！各階級のトップファイターは誰？">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
+    
+    <link rel="stylesheet" href="styles-v2.css">
+    <link rel="stylesheet" href="rankings-v2.css">
 </head>
 <body>
     <header>
@@ -143,6 +161,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="realtime-sync.js"></script>
     <script>
         // Initialize fighters data for ranking page
         let fightersData = [];
@@ -291,7 +310,9 @@
             `;
             
             document.getElementById('fighter-profile').innerHTML = profileHtml;
-            document.getElementById('fighter-modal').style.display = 'block';
+            const modal = document.getElementById('fighter-modal');
+            modal.style.display = 'flex';
+            modal.classList.add('show');
         }
         
         // Show edit form
@@ -299,8 +320,13 @@
             const fighter = fightersData.find(f => f.id === fighterId);
             if (!fighter) return;
             
-            document.getElementById('fighter-modal').style.display = 'none';
-            document.getElementById('edit-modal').style.display = 'block';
+            const fighterModal = document.getElementById('fighter-modal');
+            fighterModal.style.display = 'none';
+            fighterModal.classList.remove('show');
+            
+            const editModal = document.getElementById('edit-modal');
+            editModal.style.display = 'flex';
+            editModal.classList.add('show');
             
             // Populate form
             document.getElementById('edit-fighter-id').value = fighter.id;
@@ -335,11 +361,17 @@
             fighter.characteristic = document.getElementById('edit-characteristic').value;
             fighter.motivation = document.getElementById('edit-motivation').value;
             
-            // Save to localStorage
-            localStorage.setItem('fightersData', JSON.stringify(fightersData));
+            // Save to localStorage with real-time sync
+            if (window.realtimeSync) {
+                window.realtimeSync.updateFighters(fightersData);
+            } else {
+                localStorage.setItem('fightersData', JSON.stringify(fightersData));
+            }
             
             // Close modal and show success
-            document.getElementById('edit-modal').style.display = 'none';
+            const editModal = document.getElementById('edit-modal');
+            editModal.style.display = 'none';
+            editModal.classList.remove('show');
             alert('プロフィールが更新されました！');
             
             // Show updated profile
@@ -376,10 +408,20 @@
             loadFightersData();
             console.log('Fighters data loaded:', fightersData.length, 'fighters');
             
+            // Initialize real-time sync for fighters
+            if (window.realtimeSync) {
+                window.realtimeSync.onFighterUpdate((updatedFightersData) => {
+                    fightersData = updatedFightersData;
+                    console.log('Fighters data updated via real-time sync:', fightersData.length, 'fighters');
+                });
+            }
+            
             // Modal close buttons
             document.querySelectorAll('.close').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
+                    const modal = this.closest('.modal');
+                    modal.style.display = 'none';
+                    modal.classList.remove('show');
                 });
             });
             
@@ -387,6 +429,7 @@
             window.addEventListener('click', (e) => {
                 if (e.target.classList.contains('modal')) {
                     e.target.style.display = 'none';
+                    e.target.classList.remove('show');
                 }
             });
             
@@ -400,7 +443,9 @@
             const cancelBtn = document.querySelector('.cancel-btn');
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', () => {
-                    document.getElementById('edit-modal').style.display = 'none';
+                    const editModal = document.getElementById('edit-modal');
+                    editModal.style.display = 'none';
+                    editModal.classList.remove('show');
                 });
             }
         });

@@ -3,8 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者 - Jiufight</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>🔐 管理者画面 - Super Yawara Cup 2025 | 大会運営システム</title>
+    <meta name="description" content="Super Yawara Cup 2025 大会運営者専用の管理画面。アナウンス投稿、試合進行管理、選手情報更新などの機能を提供。">
+    <meta name="keywords" content="管理者,大会運営,アナウンス管理,試合管理">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- OGP Meta Tags -->
+    <meta property="og:title" content="🔐 管理者画面 - Super Yawara Cup 2025">
+    <meta property="og:description" content="大会運営者専用の管理システム">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jiufight.com/admin.html">
+    <meta property="og:site_name" content="Jiufight">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
+    
+    <link rel="stylesheet" href="styles-v2.css">
     <style>
         /* Password screen styles */
         .password-screen {
@@ -365,6 +379,7 @@
     </footer>
 
     <script src="script.js"></script>
+    <script src="realtime-sync.js"></script>
     <script>
         // Password authentication
         const correctPassword = 'jiufight';
@@ -380,6 +395,10 @@
                 // Hide password screen and show admin content
                 document.getElementById('password-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
+                
+                // Initialize admin functions
+                loadCurrentMatch();
+                displayAnnouncements();
                 
                 // Clear password input
                 document.getElementById('password-input').value = '';
@@ -404,6 +423,8 @@
             if (isAuthenticated) {
                 document.getElementById('password-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
+                loadCurrentMatch();
+                displayAnnouncements();
             }
         });
         
@@ -442,8 +463,8 @@
             document.getElementById('total-matches').textContent = totalMatches;
             document.getElementById('current-match-info').textContent = matches[currentMatchNumber - 1] || '不明';
             
-            // localStorageに保存
-            localStorage.setItem('currentMatch', currentMatchNumber);
+            // リアルタイム同期で保存
+            window.realtimeSync.updateMatch(currentMatchNumber);
         }
 
         function nextMatch() {
@@ -458,6 +479,11 @@
                 currentMatchNumber--;
                 updateMatchDisplay();
             }
+        }
+
+        function loadCurrentMatch() {
+            currentMatchNumber = parseInt(localStorage.getItem('currentMatch') || '1');
+            updateMatchDisplay();
         }
 
         function addAnnouncement(event) {
@@ -476,7 +502,9 @@
             };
             
             announcements.unshift(announcement);
-            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // リアルタイム同期で保存
+            window.realtimeSync.updateAnnouncements(announcements);
             
             document.getElementById('announcement-text').value = '';
             displayAnnouncements();
@@ -484,7 +512,10 @@
 
         function deleteAnnouncement(id) {
             announcements = announcements.filter(a => a.id !== id);
-            localStorage.setItem('announcements', JSON.stringify(announcements));
+            
+            // リアルタイム同期で保存
+            window.realtimeSync.updateAnnouncements(announcements);
+            
             displayAnnouncements();
         }
 
