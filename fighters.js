@@ -1381,7 +1381,7 @@ function handleEditSubmit(e) {
     
     // Save to localStorage with real-time sync
     if (window.realtimeSync) {
-        window.realtimeSync.updateFighters(fightersData);
+        window.databaseSync.updateFighters(fightersData);
     } else {
         localStorage.setItem('fightersData', JSON.stringify(fightersData));
     }

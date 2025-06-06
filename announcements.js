@@ -18,12 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     startAutoRefresh();
     
     // Initialize real-time sync listeners
-    if (window.realtimeSync) {
-        window.realtimeSync.onAnnouncementUpdate((announcements) => {
+    if (window.databaseSync) {
+        window.databaseSync.onAnnouncementUpdate((announcements) => {
             loadAnnouncements();
         });
         
-        window.realtimeSync.onMatchUpdate((matchNumber) => {
+        window.databaseSync.onMatchUpdate((matchNumber) => {
             loadMatchProgress();
         });
     }

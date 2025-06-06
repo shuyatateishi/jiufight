@@ -160,8 +160,17 @@
         </div>
     </footer>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Database Sync System -->
+    <script src="database-sync.js"></script>
+    
     <script src="script.js"></script>
-    <script src="realtime-sync.js"></script>
     <script>
         // Initialize fighters data for ranking page
         let fightersData = [];
@@ -362,8 +371,8 @@
             fighter.motivation = document.getElementById('edit-motivation').value;
             
             // Save to localStorage with real-time sync
-            if (window.realtimeSync) {
-                window.realtimeSync.updateFighters(fightersData);
+            if (window.databaseSync) {
+                window.databaseSync.updateFighters(fightersData);
             } else {
                 localStorage.setItem('fightersData', JSON.stringify(fightersData));
             }
@@ -409,8 +418,8 @@
             console.log('Fighters data loaded:', fightersData.length, 'fighters');
             
             // Initialize real-time sync for fighters
-            if (window.realtimeSync) {
-                window.realtimeSync.onFighterUpdate((updatedFightersData) => {
+            if (window.databaseSync) {
+                window.databaseSync.onFighterUpdate((updatedFightersData) => {
                     fightersData = updatedFightersData;
                     console.log('Fighters data updated via real-time sync:', fightersData.length, 'fighters');
                 });

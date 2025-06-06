@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Firebase設定 - Jiufight Database Setup</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ff0040 0%, #cc0033 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .status {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196f3;
+        }
+        .step {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .step h3 {
+            color: #ff0040;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .step-number {
+            display: inline-block;
+            background: #ff0040;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ffeaa7;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #c3e6cb;
+            margin: 15px 0;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-test {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        .config-status {
+            text-align: center;
+            margin: 30px 0;
+        }
+        ol {
+            padding-left: 0;
+        }
+        ol li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Firebase データベース設定</h1>
+            <p>Jiufightの別端末間同期を有効にするために、Firebaseの設定が必要です</p>
+        </div>
+
+        <div class="status">
+            <h3>📊 現在の状態</h3>
+            <div id="connection-status">確認中...</div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">1</span>Firebaseプロジェクトを作成</h3>
+            <ol>
+                <li><a href="https://console.firebase.google.com/" target="_blank" class="btn">Firebase Console を開く</a></li>
+                <li>「プロジェクトを作成」をクリック</li>
+                <li>プロジェクト名を入力（例：<code>jiufight</code>）</li>
+                <li>Googleアナリティクスは無効でOK</li>
+                <li>「プロジェクトを作成」をクリック</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">2</span>Realtime Database を有効化</h3>
+            <ol>
+                <li>左メニューから「Realtime Database」を選択</li>
+                <li>「データベースを作成」をクリック</li>
+                <li>場所を「asia-southeast1 (シンガポール)」に設定</li>
+                <li>セキュリティルールで「テストモードで開始」を選択</li>
+                <li>「有効にする」をクリック</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">3</span>Web アプリの設定</h3>
+            <ol>
+                <li>プロジェクト設定（⚙️ アイコン）→「プロジェクトの設定」</li>
+                <li>「マイアプリ」で「&lt;/&gt;」（Web）アイコンをクリック</li>
+                <li>アプリのニックネーム：<code>jiufight-web</code></li>
+                <li>「アプリを登録」をクリック</li>
+                <li>表示される設定情報をコピー</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">4</span>設定ファイルを更新</h3>
+            <p><code>firebase-config.js</code> ファイルを開いて、以下の部分を実際の値に置き換えてください：</p>
+            
+            <div class="code-block">
+const firebaseConfig = {
+    apiKey: "あなたのAPIキーをここに",
+    authDomain: "プロジェクト名.firebaseapp.com",
+    databaseURL: "https://プロジェクト名-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "プロジェクト名",
+    storageBucket: "プロジェクト名.appspot.com",
+    messagingSenderId: "数字",
+    appId: "アプリID"
+};
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ 重要:</strong> <code>databaseURL</code> は地域によって異なります。Firebaseコンソールで正確なURLを確認してください。
+            </div>
+        </div>
+
+        <div class="step">
+            <h3><span class="step-number">5</span>動作確認</h3>
+            <div class="config-status">
+                <button onclick="testConnection()" class="btn btn-test">🧪 接続テスト実行</button>
+                <div id="test-results" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="success" style="display: none;" id="success-message">
+            <h4>✅ 設定完了！</h4>
+            <p>Firebaseデータベースが正常に設定されました。これで全ての端末でリアルタイム同期が利用可能です。</p>
+            <div style="margin-top: 15px;">
+                <a href="cross-device-test.html" class="btn">🌐 別端末間同期テスト</a>
+                <a href="index.html" class="btn">🏠 ホームページに戻る</a>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔧 トラブルシューティング</h3>
+            <ul>
+                <li><strong>接続エラー:</strong> databaseURLが正しいか確認</li>
+                <li><strong>権限エラー:</strong> Realtime Databaseのセキュリティルールを確認</li>
+                <li><strong>データが表示されない:</strong> ブラウザの開発者ツールでエラーをチェック</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Database Sync System -->
+    <script src="database-sync.js"></script>
+
+    <script>
+        let statusInterval;
+
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            
+            if (typeof firebase === 'undefined') {
+                statusElement.innerHTML = `
+                    <div style="color: #dc3545;">❌ Firebase SDK が読み込まれていません</div>
+                    <small>Firebase設定を確認してください</small>
+                `;
+                return;
+            }
+
+            if (!window.firebaseDB) {
+                statusElement.innerHTML = `
+                    <div style="color: #fd7e14;">⚠️ Firebase設定が不完全です</div>
+                    <small>firebase-config.jsを確認してください</small>
+                `;
+                return;
+            }
+
+            if (window.databaseSync && window.databaseSync.getSyncStatus) {
+                const status = window.databaseSync.getSyncStatus();
+                
+                if (status.isOnline && status.hasDatabase) {
+                    statusElement.innerHTML = `
+                        <div style="color: #28a745; font-weight: bold;">✅ Firebase接続成功</div>
+                        <small>端末ID: ${status.deviceId}</small><br>
+                        <small>データベース: 接続済み | リアルタイム同期: 有効</small>
+                    `;
+                    document.getElementById('success-message').style.display = 'block';
+                } else {
+                    statusElement.innerHTML = `
+                        <div style="color: #fd7e14;">🔄 Firebase接続中...</div>
+                        <small>端末ID: ${status.deviceId}</small><br>
+                        <small>オンライン: ${status.isOnline ? 'はい' : 'いいえ'} | データベース: ${status.hasDatabase ? '接続済み' : '未接続'}</small>
+                    `;
+                }
+            } else {
+                statusElement.innerHTML = `
+                    <div style="color: #dc3545;">❌ データベース同期システムが利用できません</div>
+                    <small>database-sync.jsを確認してください</small>
+                `;
+            }
+        }
+
+        function testConnection() {
+            const resultsElement = document.getElementById('test-results');
+            resultsElement.innerHTML = '<div style="color: #007bff;">🔄 接続テスト実行中...</div>';
+
+            setTimeout(() => {
+                if (window.databaseSync && window.databaseSync.getSyncStatus) {
+                    const status = window.databaseSync.getSyncStatus();
+                    
+                    let result = '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">';
+                    result += `<h5>📊 テスト結果</h5>`;
+                    result += `<p><strong>Firebase SDK:</strong> ${typeof firebase !== 'undefined' ? '✅ 読み込み済み' : '❌ 未読み込み'}</p>`;
+                    result += `<p><strong>データベース接続:</strong> ${status.hasDatabase ? '✅ 接続済み' : '❌ 未接続'}</p>`;
+                    result += `<p><strong>オンライン状態:</strong> ${status.isOnline ? '✅ オンライン' : '❌ オフライン'}</p>`;
+                    result += `<p><strong>同期システム:</strong> ${window.databaseSync ? '✅ 利用可能' : '❌ 利用不可'}</p>`;
+                    result += `<p><strong>端末ID:</strong> ${status.deviceId}</p>`;
+                    
+                    if (status.isOnline && status.hasDatabase) {
+                        result += '<div style="color: #28a745; font-weight: bold; margin-top: 15px;">🎉 全ての機能が正常に動作しています！</div>';
+                        window.databaseSync.forceSync();
+                        result += '<p><small>強制同期を実行しました</small></p>';
+                    } else {
+                        result += '<div style="color: #dc3545; font-weight: bold; margin-top: 15px;">⚠️ 設定を見直してください</div>';
+                    }
+                    
+                    result += '</div>';
+                    resultsElement.innerHTML = result;
+                } else {
+                    resultsElement.innerHTML = '<div style="color: #dc3545;">❌ テストに失敗しました。システムが利用できません。</div>';
+                }
+            }, 2000);
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateConnectionStatus();
+            statusInterval = setInterval(updateConnectionStatus, 3000);
+        });
+
+        // ページ離脱時のクリーンアップ
+        window.addEventListener('beforeunload', () => {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+            }
+        });
+    </script>
+</body>
+</html>

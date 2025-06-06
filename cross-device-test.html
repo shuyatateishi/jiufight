@@ -193,7 +193,15 @@
         </div>
     </div>
 
-    <script src="realtime-sync.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Database Sync System -->
+    <script src="database-sync.js"></script>
     <script>
         let testLog = [];
         let monitorInterval = null;
@@ -236,11 +244,11 @@
             updateDeviceInfo();
             
             // リアルタイム同期システムの状態確認
-            if (window.realtimeSync) {
+            if (window.databaseSync) {
                 log('✅ リアルタイム同期システムが利用可能');
                 
                 // 選手データ更新の監視
-                window.realtimeSync.onFighterUpdate((updatedData) => {
+                window.databaseSync.onFighterUpdate((updatedData) => {
                     log(`🔄 選手データ更新を検知! 選手数: ${updatedData.length}`);
                     showResult(`🔄 リアルタイム更新検知: ${updatedData.length}人の選手データ`, 'success');
                     updateStatusCards();
@@ -256,9 +264,9 @@
         function updateDeviceInfo() {
             const deviceInfo = {
                 userAgent: navigator.userAgent,
-                deviceId: window.realtimeSync ? window.realtimeSync.deviceId : '不明',
+                deviceId: window.databaseSync ? window.databaseSync.deviceId : '不明',
                 timestamp: new Date().toLocaleString(),
-                syncSupport: !!window.realtimeSync
+                syncSupport: !!window.databaseSync
             };
             
             document.getElementById('device-info').innerHTML = `
@@ -279,9 +287,9 @@
         }
         
         function updateStatusCards() {
-            if (!window.realtimeSync) return;
+            if (!window.databaseSync) return;
             
-            const status = window.realtimeSync.getSyncStatus();
+            const status = window.databaseSync.getSyncStatus();
             
             document.getElementById('system-status').innerHTML = `
                 端末ID: ${status.deviceId}<br>
@@ -317,7 +325,7 @@
             log('🔥 別端末間同期テスト開始');
             showResult('🚀 別端末同期テストを実行中...', 'info');
             
-            if (!window.realtimeSync) {
+            if (!window.databaseSync) {
                 showResult('❌ リアルタイム同期システムが利用できません', 'error');
                 return;
             }
@@ -329,10 +337,10 @@
                 nickname: `端末間同期テスター_${Date.now()}`,
                 belt: 'black',
                 weight: 'light',
-                dojo: `${window.realtimeSync.deviceId}_道場`,
+                dojo: `${window.databaseSync.deviceId}_道場`,
                 wins: 777,
                 losses: 0,
-                bio: `別端末間同期のテスト用選手 - 作成端末: ${window.realtimeSync.deviceId}`,
+                bio: `別端末間同期のテスト用選手 - 作成端末: ${window.databaseSync.deviceId}`,
                 fullName: `クロスデバイス太郎_${updateCount++}`,
                 age: '25',
                 occupation: '同期テスター',
@@ -342,7 +350,7 @@
                 characteristic: '瞬時に他端末に現れる',
                 motivation: '全端末で同期されたい！',
                 testTimestamp: new Date().toISOString(),
-                deviceOrigin: window.realtimeSync.deviceId
+                deviceOrigin: window.databaseSync.deviceId
             };
             
             // 既存データ取得
@@ -363,7 +371,7 @@
             }
             
             // リアルタイム同期で保存
-            window.realtimeSync.updateFighters(fightersData);
+            window.databaseSync.updateFighters(fightersData);
             
             log(`✅ テスト選手「${testFighter.nickname}」を保存完了`);
             showResult(`✅ テスト選手を作成・更新しました！他の端末で確認してください`, 'success');
@@ -386,7 +394,7 @@
                 testFighter.motivation = `${new Date().toLocaleTimeString()}に更新されました！`;
                 testFighter.wins = testFighter.wins + 1;
                 
-                window.realtimeSync.updateFighters(fightersData);
+                window.databaseSync.updateFighters(fightersData);
                 log('✅ テスト選手を更新しました');
                 showResult('✅ テスト選手を更新しました', 'success');
             } else {
@@ -403,7 +411,7 @@
             fightersData = fightersData.filter(f => f.id !== 88888);
             
             if (fightersData.length < originalLength) {
-                window.realtimeSync.updateFighters(fightersData);
+                window.databaseSync.updateFighters(fightersData);
                 log('✅ テスト選手を削除しました');
                 showResult('✅ テスト選手を削除しました', 'success');
             } else {
@@ -413,12 +421,12 @@
         }
         
         function checkSyncStatus() {
-            if (!window.realtimeSync) {
+            if (!window.databaseSync) {
                 showResult('❌ リアルタイム同期システムが利用できません', 'error');
                 return;
             }
             
-            const status = window.realtimeSync.getSyncStatus();
+            const status = window.databaseSync.getSyncStatus();
             log('現在の同期状態:');
             log(JSON.stringify(status, null, 2));
             showResult(`📊 同期状態をログに出力しました`, 'info');
@@ -426,12 +434,12 @@
         }
         
         function forceSyncCheck() {
-            if (!window.realtimeSync) {
+            if (!window.databaseSync) {
                 showResult('❌ リアルタイム同期システムが利用できません', 'error');
                 return;
             }
             
-            window.realtimeSync.forceSyncCheck();
+            window.databaseSync.forceSyncCheck();
             showResult('🔄 強制同期チェックを実行しました', 'info');
             updateStatusCards();
         }
