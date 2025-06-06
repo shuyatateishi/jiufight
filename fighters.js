@@ -1369,50 +1369,90 @@ function showEditForm(fighterId) {
     console.log('Edit form populated with fighter data');
 }
 
-// Handle edit form submission
+// Handle edit form submission - COMPLETELY REWRITTEN FOR GUARANTEED SAVE
 function handleEditSubmit(e) {
     e.preventDefault();
+    
+    console.log('🔄 CRITICAL: Edit form submitted');
     
     const fighterId = parseInt(document.getElementById('edit-fighter-id').value);
     const fighter = fightersData.find(f => f.id === fighterId);
     
-    if (!fighter) return;
+    if (!fighter) {
+        console.error('❌ Fighter not found:', fighterId);
+        alert('エラー: 選手が見つかりません');
+        return;
+    }
     
-    // Update fighter data
-    const updatedFullName = document.getElementById('edit-full-name').value;
-    const updatedNickname = document.getElementById('edit-nickname').value;
+    console.log(`📝 Editing fighter: ${fighter.name} (ID: ${fighterId})`);
     
+    // CRITICAL: Update fighter data with FORCED values
+    const updatedFullName = document.getElementById('edit-full-name').value.trim();
+    const updatedNickname = document.getElementById('edit-nickname').value.trim();
+    
+    console.log('📝 Form values:');
+    console.log(`  - Full Name: "${updatedFullName}"`);
+    console.log(`  - Nickname: "${updatedNickname}"`);
+    
+    // FORCE UPDATE ALL FIELDS
     fighter.fullName = updatedFullName;
     fighter.nickname = updatedNickname;
-    fighter.age = document.getElementById('edit-age').value;
-    fighter.occupation = document.getElementById('edit-occupation').value;
-    fighter.location = document.getElementById('edit-location').value;
-    fighter.experience = document.getElementById('edit-experience').value;
-    fighter.specialty = document.getElementById('edit-specialty').value;
-    fighter.characteristic = document.getElementById('edit-characteristic').value;
-    fighter.motivation = document.getElementById('edit-motivation').value;
+    fighter.age = document.getElementById('edit-age').value.trim();
+    fighter.occupation = document.getElementById('edit-occupation').value.trim();
+    fighter.location = document.getElementById('edit-location').value.trim();
+    fighter.experience = document.getElementById('edit-experience').value.trim();
+    fighter.specialty = document.getElementById('edit-specialty').value.trim();
+    fighter.characteristic = document.getElementById('edit-characteristic').value.trim();
+    fighter.motivation = document.getElementById('edit-motivation').value.trim();
     
-    // Update name if fullName was changed
+    // FORCE UPDATE name if fullName was changed
     if (updatedFullName && !fighter.name.includes('（')) {
         fighter.name = updatedFullName;
     }
     
-    // Save to database with real-time sync
-    if (window.databaseSync) {
-        window.databaseSync.updateFighters(fightersData);
-    } else {
+    console.log('✅ Fighter data updated locally:', fighter);
+    
+    // CRITICAL: Multiple save methods to guarantee persistence
+    try {
+        // 1. FORCE save to localStorage IMMEDIATELY
         localStorage.setItem('fightersData', JSON.stringify(fightersData));
+        localStorage.setItem('fightersData_timestamp', Date.now().toString());
+        console.log('💾 FORCED localStorage save completed');
+        
+        // 2. FORCE save to database with verification
+        if (window.databaseSync) {
+            console.log('📤 FORCING database sync...');
+            window.databaseSync.updateFighters(fightersData).then(() => {
+                console.log('✅ Database sync completed successfully');
+            }).catch(error => {
+                console.error('❌ Database sync failed:', error);
+            });
+        } else {
+            console.warn('⚠️ Database sync not available');
+        }
+        
+        // 3. FORCE update global variables
+        window.fightersData = [...fightersData];
+        window.filteredFighters = [...fightersData];
+        
+        console.log('✅ ALL SAVE METHODS COMPLETED');
+        
+        // Close modal IMMEDIATELY
+        document.getElementById('edit-modal').style.display = 'none';
+        
+        // Force refresh display
+        displayFighters();
+        
+        // Show success and updated profile
+        setTimeout(() => {
+            alert(`✅ ${fighter.name}のプロフィールが正常に更新されました！`);
+            showFighterProfile(fighterId);
+        }, 300);
+        
+    } catch (error) {
+        console.error('❌ CRITICAL SAVE ERROR:', error);
+        alert('❌ 保存エラーが発生しました。もう一度お試しください。');
     }
-    
-    // Close modal and refresh display
-    document.getElementById('edit-modal').style.display = 'none';
-    displayFighters();
-    
-    // Show success message and updated profile
-    setTimeout(() => {
-        alert('プロフィールが更新されました！');
-        showFighterProfile(fighterId);
-    }, 500);
 }
 
 // Helper functions

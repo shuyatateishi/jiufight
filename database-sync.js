@@ -143,55 +143,94 @@ class DatabaseSync {
         }
     }
     
-    // Set up real-time listeners for fighters data
+    // Set up real-time listeners for fighters data - COMPLETELY REWRITTEN
     setupFightersListener() {
         if (!this.db) return;
         
-        console.log('🎯 Setting up fighters listener...');
+        console.log('🎯 Setting up CRITICAL fighters listener...');
         
-        this.db.ref('fighters').on('value', (snapshot) => {
-            console.log('📡 Fighters snapshot received');
+        // Listen to both fightersArray (primary) and fighters (backup)
+        this.db.ref('fightersArray').on('value', (snapshot) => {
+            console.log('📡 FightersArray snapshot received');
             const data = snapshot.val();
             
-            if (data) {
-                // Convert object to array if needed
-                const fightersArray = Array.isArray(data) ? data : Object.values(data);
-                
-                console.log(`📊 Received ${fightersArray.length} fighters from Firebase`);
-                
-                // Check if this is a different update from what we have
-                const currentDataStr = JSON.stringify(this.localCache.fighters);
-                const newDataStr = JSON.stringify(fightersArray);
-                
-                if (currentDataStr !== newDataStr) {
-                    console.log('✨ Data is different, updating local cache...');
-                    
-                    // Update local cache
-                    this.localCache.fighters = fightersArray;
-                    localStorage.setItem('fightersData', JSON.stringify(fightersArray));
-                    localStorage.setItem('fightersData_timestamp', Date.now().toString());
-                    
-                    // Notify callbacks
-                    console.log(`📢 Notifying ${this.callbacks.fighters.length} callbacks...`);
-                    this.callbacks.fighters.forEach((callback, index) => {
-                        try {
-                            console.log(`  → Calling callback ${index + 1}`);
-                            callback(fightersArray);
-                        } catch (error) {
-                            console.error(`Callback ${index + 1} error:`, error);
-                        }
-                    });
-                    
-                    console.log(`🔄 Fighters data updated from database: ${fightersArray.length} fighters`);
-                } else {
-                    console.log('⏭️ Data is same, skipping update');
-                }
+            if (data && Array.isArray(data)) {
+                console.log(`📊 Received ${data.length} fighters from Firebase (fightersArray)`);
+                this.processFightersUpdate(data, 'fightersArray');
             } else {
-                console.log('⚠️ No fighters data in snapshot');
+                console.log('⚠️ No valid fightersArray data, checking fighters...');
+                // Fallback to fighters if fightersArray is empty
+                this.checkFightersBackup();
             }
         }, (error) => {
-            console.error('❌ Firebase listener error:', error);
+            console.error('❌ Firebase fightersArray listener error:', error);
+            this.checkFightersBackup();
         });
+        
+        // Secondary listener for fighters (backup)
+        this.db.ref('fighters').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data && !this.localCache.fighters.length) {
+                console.log('📡 Using fighters backup data');
+                const fightersArray = Array.isArray(data) ? data : Object.values(data);
+                this.processFightersUpdate(fightersArray, 'fighters-backup');
+            }
+        });
+    }
+    
+    // Check fighters backup
+    checkFightersBackup() {
+        if (!this.db) return;
+        
+        this.db.ref('fighters').once('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const fightersArray = Array.isArray(data) ? data : Object.values(data);
+                console.log(`📊 Found ${fightersArray.length} fighters in backup location`);
+                this.processFightersUpdate(fightersArray, 'fighters-backup');
+            }
+        });
+    }
+    
+    // Process fighters update
+    processFightersUpdate(fightersArray, source) {
+        console.log(`🔄 Processing fighters update from ${source}: ${fightersArray.length} fighters`);
+        
+        // Check if this is a different update from what we have
+        const currentDataStr = JSON.stringify(this.localCache.fighters);
+        const newDataStr = JSON.stringify(fightersArray);
+        
+        if (currentDataStr !== newDataStr) {
+            console.log('✨ Data is different, FORCING update...');
+            
+            // Update local cache IMMEDIATELY
+            this.localCache.fighters = [...fightersArray];
+            localStorage.setItem('fightersData', JSON.stringify(fightersArray));
+            localStorage.setItem('fightersData_timestamp', Date.now().toString());
+            
+            // Notify ALL callbacks immediately
+            console.log(`📢 FORCING notification to ${this.callbacks.fighters.length} callbacks...`);
+            this.callbacks.fighters.forEach((callback, index) => {
+                try {
+                    console.log(`  → FORCING callback ${index + 1}`);
+                    setTimeout(() => callback(fightersArray), 0);
+                } catch (error) {
+                    console.error(`Callback ${index + 1} error:`, error);
+                }
+            });
+            
+            console.log(`✅ FIGHTERS DATA FORCIBLY UPDATED: ${fightersArray.length} fighters from ${source}`);
+        } else {
+            console.log('⏭️ Data is same, but still notifying callbacks...');
+            // Even if data is same, notify callbacks in case UI needs refresh
+            this.callbacks.fighters.forEach((callback, index) => {
+                try {
+                    setTimeout(() => callback(fightersArray), 0);
+                } catch (error) {
+                    console.error(`Callback ${index + 1} error:`, error);
+                }
+            });
+        }
     }
     
     // Set up real-time listeners for announcements
@@ -244,58 +283,86 @@ class DatabaseSync {
         });
     }
     
-    // Update fighters data
+    // Update fighters data - COMPLETELY REWRITTEN FOR GUARANTEED SYNC
     async updateFighters(fightersData) {
-        console.log(`🔄 updateFighters called with ${fightersData.length} fighters`);
+        console.log(`🔄 CRITICAL updateFighters called with ${fightersData.length} fighters`);
         console.log(`📊 Database status: online=${this.isOnline}, db=${!!this.db}`);
         
         const updateData = {
-            data: fightersData,
+            fightersArray: fightersData,
             timestamp: Date.now(),
-            deviceId: this.deviceId
+            deviceId: this.deviceId,
+            count: fightersData.length
         };
+        
+        // FORCE SAVE TO LOCAL STORAGE FIRST
+        localStorage.setItem('fightersData', JSON.stringify(fightersData));
+        localStorage.setItem('fightersData_timestamp', updateData.timestamp.toString());
+        console.log(`💾 FORCED Local storage save completed`);
         
         if (this.db && this.isOnline) {
             try {
-                console.log(`📤 Saving fighters to Firebase...`);
+                console.log(`📤 FORCING Firebase save...`);
                 
-                // Firebaseに保存（配列をそのまま保存）
-                const fightersRef = this.db.ref('fighters');
-                await fightersRef.set(fightersData);
-                console.log(`✅ Fighters array saved to Firebase`);
+                // Firebaseに強制保存（配列として保存）
+                const batch = {};
                 
-                // メタデータも保存
-                const metadataRef = this.db.ref('metadata/fighters');
-                await metadataRef.set({
+                // fightersを配列として保存
+                batch['/fightersArray'] = fightersData;
+                
+                // メタデータを保存
+                batch['/metadata/fighters'] = {
                     lastUpdate: updateData.timestamp,
                     deviceId: updateData.deviceId,
-                    count: fightersData.length
-                });
-                console.log(`✅ Metadata saved to Firebase`);
+                    count: fightersData.length,
+                    syncStatus: 'completed'
+                };
                 
-                console.log(`✅ Fighters data saved to database (${fightersData.length} fighters)`);
+                // 個別選手データも保存（バックアップ）
+                fightersData.forEach((fighter, index) => {
+                    batch[`/fighters/${fighter.id}`] = fighter;
+                });
+                
+                // バッチアップデート実行
+                await this.db.ref().update(batch);
+                console.log(`✅ BATCH UPDATE COMPLETED to Firebase`);
+                
+                // 確認のため読み取り
+                const verifySnapshot = await this.db.ref('fightersArray').once('value');
+                const verifyData = verifySnapshot.val();
+                console.log(`🔍 VERIFICATION: Firebase has ${verifyData ? verifyData.length : 0} fighters`);
+                
+                if (!verifyData || verifyData.length !== fightersData.length) {
+                    console.error(`❌ VERIFICATION FAILED! Expected ${fightersData.length}, got ${verifyData ? verifyData.length : 0}`);
+                    throw new Error('Firebase save verification failed');
+                }
+                
+                console.log(`✅ COMPLETE SUCCESS: Fighters data saved and verified in database`);
                 console.log(`📱 Device ID: ${this.deviceId}`);
                 console.log(`🕐 Timestamp: ${updateData.timestamp}`);
                 
-                // 保存後、データが正しく保存されたか確認
-                const verifySnapshot = await fightersRef.once('value');
-                const verifyData = verifySnapshot.val();
-                console.log(`🔍 Verification: Firebase has ${verifyData ? verifyData.length : 0} fighters`);
-                
             } catch (error) {
-                console.error('❌ Database update error:', error);
+                console.error('❌ CRITICAL DATABASE ERROR:', error);
                 console.error('Error details:', error.message);
-                this.saveToLocalStorage('fighters', fightersData);
+                
+                // 緊急時：直接setで再試行
+                try {
+                    console.log('🚨 EMERGENCY RETRY with direct set...');
+                    await this.db.ref('fightersArray').set(fightersData);
+                    console.log('✅ Emergency save succeeded');
+                } catch (retryError) {
+                    console.error('❌ Emergency retry also failed:', retryError);
+                    this.saveToLocalStorage('fighters', fightersData);
+                }
             }
         } else {
-            console.log(`💾 Using localStorage fallback`);
+            console.log(`📴 OFFLINE: Using localStorage only`);
             this.saveToLocalStorage('fighters', fightersData);
         }
         
-        // Always save to localStorage as backup
-        localStorage.setItem('fightersData', JSON.stringify(fightersData));
-        localStorage.setItem('fightersData_timestamp', updateData.timestamp.toString());
-        console.log(`💾 Local storage updated with timestamp ${updateData.timestamp}`);
+        // 強制的にローカルキャッシュも更新
+        this.localCache.fighters = [...fightersData];
+        console.log(`🔄 Local cache forcibly updated with ${fightersData.length} fighters`);
     }
     
     // Update announcements
