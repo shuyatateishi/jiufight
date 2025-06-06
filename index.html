@@ -307,5 +307,111 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        // Load ranking data dynamically
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRankingPreview();
+        });
+
+        function loadRankingPreview() {
+            // Weight class rankings data
+            const rankingsData = {
+                'rooster': [
+                    { rank: 1, name: '永塚 和寛', nickname: '永塚', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 2, name: '綿貫 智也', nickname: '綿貫', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 3, name: '小野 太暉', nickname: '', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 4, name: '馬場 祐次', nickname: '焼肉古今の司令塔ばばちゃん', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 5, name: '松下 ともゆき', nickname: '松下', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ],
+                'light-feather': [
+                    { rank: 1, name: '野島 繁昭', nickname: '', belt: 'purple', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 2, name: '渡辺 晋', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 3, name: '西尾 健斗', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 4, name: 'シンヤ', nickname: '', belt: 'purple', dojo: 'FHR', wins: 0, losses: 0 },
+                    { rank: 5, name: '公文 卓馬', nickname: '', belt: 'purple', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ],
+                'feather': [
+                    { rank: 1, name: 'Leander De Souza', nickname: 'Le', belt: 'purple', dojo: 'FHR', wins: 0, losses: 0 },
+                    { rank: 2, name: '河野 裕也', nickname: '', belt: 'purple', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 3, name: '中西 亮介', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 4, name: '秋山 紳右衛門', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 5, name: '武田 好史', nickname: '', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ],
+                'light': [
+                    { rank: 1, name: '松木 フェルナンド', nickname: '', belt: 'black', dojo: 'FHR', wins: 0, losses: 0, special: '⭐' },
+                    { rank: 2, name: '原田 大樹', nickname: '', belt: 'black', dojo: 'FHR', wins: 0, losses: 0 },
+                    { rank: 3, name: '田邊 大吾', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 4, name: 'kentaroh Awata', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 5, name: '岡島 悠裕', nickname: 'スマイリー岡島', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ],
+                'middle': [
+                    { rank: 1, name: 'Hideki Da Silva', nickname: 'Hi', belt: 'brown', dojo: 'FHR', wins: 0, losses: 0 },
+                    { rank: 2, name: 'サコ', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 3, name: '岩月 穂波', nickname: '', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 4, name: '中路 拓也', nickname: '', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 5, name: '井柳 俊紀', nickname: '', belt: 'white', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ],
+                'medium-heavy': [
+                    { rank: 1, name: '三木 善靖', nickname: '', belt: 'purple', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 2, name: '佐藤 篤史', nickname: '', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 },
+                    { rank: 3, name: '宮本 博之', nickname: 'いにしえのドリーマー宮本', belt: 'blue', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0 }
+                ]
+            };
+
+            let currentWeight = 'rooster';
+            
+            // Set up weight class tabs
+            const tabs = document.querySelectorAll('.weight-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentWeight = tab.dataset.weight;
+                    updateRankingTable(currentWeight);
+                });
+            });
+
+            function updateRankingTable(weightClass) {
+                const tableBody = document.querySelector('.ranking-table tbody');
+                const weightClassNames = {
+                    'rooster': 'ルースター',
+                    'light-feather': 'ライトフェザー',
+                    'feather': 'フェザー',
+                    'light': 'ライト',
+                    'middle': 'ミドル',
+                    'medium-heavy': 'ミディアムヘビー'
+                };
+
+                // Update title
+                document.querySelector('.ranking-table-preview h3').textContent = `${weightClassNames[weightClass]}級 - トップ5選手`;
+
+                // Update table content
+                const rankings = rankingsData[weightClass] || [];
+                tableBody.innerHTML = rankings.slice(0, 5).map(fighter => {
+                    const beltColors = {
+                        'white': '白',
+                        'blue': '青',
+                        'purple': '紫',
+                        'brown': '茶',
+                        'black': '黒'
+                    };
+                    
+                    return `
+                        <tr>
+                            <td>${fighter.rank}</td>
+                            <td><div class="fighter-avatar"></div></td>
+                            <td><span class="belt-indicator belt-${fighter.belt}">${beltColors[fighter.belt]}</span></td>
+                            <td>${fighter.name}${fighter.special ? ' ' + fighter.special : ''}</td>
+                            <td>${fighter.dojo}</td>
+                            <td>${fighter.wins}勝${fighter.losses}敗</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Initialize with rooster weight class
+            updateRankingTable('rooster');
+        }
+    </script>
 </body>
 </html>

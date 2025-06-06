@@ -22,7 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeEventListeners();
     loadFightersData();
     // loadSavedData is called inside loadFightersData to ensure proper data merging
-    displayFighters();
+    
+    // Check URL parameters for weight filter
+    const urlParams = new URLSearchParams(window.location.search);
+    const weightParam = urlParams.get('weight');
+    if (weightParam) {
+        document.getElementById('weight-filter').value = weightParam;
+        filterFighters();
+    } else {
+        displayFighters();
+    }
 });
 
 // Event listeners

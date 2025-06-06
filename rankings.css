@@ -192,6 +192,18 @@
     font-size: 0.8rem;
 }
 
+/* Clickable fighter names */
+.fighter-name.clickable {
+    cursor: pointer;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.fighter-name.clickable:hover {
+    color: #a01729;
+    text-decoration: underline;
+}
+
 /* Statistics Section */
 .stats-section {
     margin-top: 3rem;
