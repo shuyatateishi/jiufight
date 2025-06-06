@@ -334,7 +334,9 @@ h3 {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     min-width: 140px;
+    min-height: 44px;
     backdrop-filter: blur(10px);
+    gap: var(--space-sm);
 }
 
 .btn::before {
@@ -519,10 +521,15 @@ footer::before {
     background: var(--bg-gradient-primary);
 }
 
-/* Responsive Design */
+/* Enhanced Mobile Design */
 @media (max-width: 768px) {
+    /* Navigation improvements */
     .mobile-menu-toggle {
         display: flex;
+        width: 44px;
+        height: 44px;
+        justify-content: center;
+        align-items: center;
     }
     
     .nav-menu {
@@ -538,6 +545,7 @@ footer::before {
         opacity: 0;
         visibility: hidden;
         transition: var(--transition);
+        z-index: 1000;
     }
     
     .nav-menu.active {
@@ -546,24 +554,117 @@ footer::before {
         visibility: visible;
     }
     
+    .nav-menu a {
+        padding: var(--space-md) 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Layout improvements */
     .hero {
-        padding: 6rem 0 3rem;
+        padding: 5rem 0 3rem;
         text-align: center;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: var(--space-md);
     }
     
     .grid-2,
     .grid-3,
     .grid-4 {
         grid-template-columns: 1fr;
+        gap: var(--space-md);
     }
     
     .container {
         padding: 0 var(--space-md);
+        max-width: 100%;
     }
     
+    /* Button improvements */
     .btn {
+        min-height: 48px;
+        padding: var(--space-md) var(--space-lg);
+        font-size: 1rem;
         width: 100%;
         justify-content: center;
+        margin: var(--space-xs) 0;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        gap: var(--space-md);
+        width: 100%;
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    /* Card improvements */
+    .card {
+        padding: var(--space-lg);
+        margin-bottom: var(--space-md);
+    }
+    
+    /* Search and filter improvements */
+    .search-container {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .search-input {
+        width: 100%;
+        min-height: 48px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: var(--space-md);
+    }
+    
+    .filter-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-sm);
+        width: 100%;
+    }
+    
+    .filter-group select {
+        min-height: 48px;
+        font-size: 16px;
+        padding: var(--space-md);
+    }
+    
+    /* Typography improvements */
+    .section-title {
+        font-size: 2rem;
+        text-align: center;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+        text-align: center;
+    }
+    
+    /* Touch target improvements */
+    a, button, input, select {
+        min-height: 44px;
+    }
+    
+    /* Spacing improvements */
+    .section {
+        padding: var(--space-2xl) 0;
     }
 }
 

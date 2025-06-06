@@ -418,12 +418,21 @@
             console.log('Fighters data loaded:', fightersData.length, 'fighters');
             
             // Initialize real-time sync for fighters
-            if (window.databaseSync) {
-                window.databaseSync.onFighterUpdate((updatedFightersData) => {
-                    fightersData = updatedFightersData;
-                    console.log('Fighters data updated via real-time sync:', fightersData.length, 'fighters');
-                });
-            }
+            setTimeout(() => {
+                if (window.databaseSync) {
+                    console.log('✅ Database sync available on rankings page');
+                    const status = window.databaseSync.getSyncStatus();
+                    console.log('📊 Rankings page sync status:', status);
+                    
+                    window.databaseSync.onFighterUpdate((updatedFightersData) => {
+                        console.log(`🔄 Rankings received fighter update: ${updatedFightersData.length} fighters`);
+                        fightersData = updatedFightersData;
+                        console.log('Fighters data updated via real-time sync:', fightersData.length, 'fighters');
+                    });
+                } else {
+                    console.log('❌ Database sync not available on rankings page');
+                }
+            }, 1000);
             
             // Modal close buttons
             document.querySelectorAll('.close').forEach(btn => {

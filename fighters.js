@@ -41,6 +41,9 @@ function initializeEventListeners() {
     document.getElementById('belt-filter').addEventListener('change', filterFighters);
     document.getElementById('weight-filter').addEventListener('change', filterFighters);
     
+    // Add new fighter button
+    document.getElementById('add-new-fighter-btn').addEventListener('click', showAddFighterModal);
+    
     // Modal close buttons
     document.querySelectorAll('.close').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -58,9 +61,14 @@ function initializeEventListeners() {
     // Edit form submit
     document.getElementById('edit-form').addEventListener('submit', handleEditSubmit);
     
-    // Cancel button
-    document.querySelector('.cancel-btn').addEventListener('click', () => {
-        document.getElementById('edit-modal').style.display = 'none';
+    // Add fighter form submit
+    document.getElementById('add-fighter-form').addEventListener('submit', handleAddFighterSubmit);
+    
+    // Cancel buttons
+    document.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
     });
 }
 
@@ -1379,8 +1387,8 @@ function handleEditSubmit(e) {
         fighter.name = updatedFullName;
     }
     
-    // Save to localStorage with real-time sync
-    if (window.realtimeSync) {
+    // Save to database with real-time sync
+    if (window.databaseSync) {
         window.databaseSync.updateFighters(fightersData);
     } else {
         localStorage.setItem('fightersData', JSON.stringify(fightersData));
@@ -1425,4 +1433,79 @@ function calculateWinRate(wins, losses) {
     const total = wins + losses;
     if (total === 0) return 0;
     return Math.round((wins / total) * 100);
+}
+
+// Show add fighter modal
+function showAddFighterModal() {
+    document.getElementById('add-fighter-modal').style.display = 'block';
+    
+    // Clear form
+    document.getElementById('add-fighter-form').reset();
+}
+
+// Handle add fighter form submission
+function handleAddFighterSubmit(e) {
+    e.preventDefault();
+    
+    // Get form values
+    const fullName = document.getElementById('new-full-name').value.trim();
+    const nickname = document.getElementById('new-nickname').value.trim();
+    const belt = document.getElementById('new-belt').value;
+    const weight = document.getElementById('new-weight').value;
+    const dojo = document.getElementById('new-dojo').value.trim();
+    const age = document.getElementById('new-age').value;
+    const bio = document.getElementById('new-bio').value.trim();
+    
+    // Validate required fields
+    if (!fullName || !belt || !weight || !dojo) {
+        alert('必須項目を入力してください。');
+        return;
+    }
+    
+    // Generate new ID
+    const maxId = Math.max(...fightersData.map(f => f.id), 0);
+    const newId = maxId + 1;
+    
+    // Create new fighter object
+    const newFighter = {
+        id: newId,
+        name: fullName,
+        nickname: nickname || '',
+        belt: belt,
+        weight: weight,
+        dojo: dojo,
+        wins: 0,
+        losses: 0,
+        bio: bio || `${fullName}選手のプロフィール`,
+        fullName: fullName,
+        age: age || '',
+        occupation: '',
+        location: '',
+        experience: '',
+        specialty: '',
+        characteristic: '',
+        motivation: '',
+        achievements: '-',
+        style: '-',
+        image: null,
+        matchHistory: []
+    };
+    
+    // Add to fighters data
+    fightersData.push(newFighter);
+    
+    // Save to database with real-time sync
+    if (window.databaseSync) {
+        window.databaseSync.updateFighters(fightersData);
+        console.log(`✅ New fighter ${fullName} added and synced to database`);
+    } else {
+        localStorage.setItem('fightersData', JSON.stringify(fightersData));
+    }
+    
+    // Close modal and refresh display
+    document.getElementById('add-fighter-modal').style.display = 'none';
+    displayFighters();
+    
+    // Show success message
+    alert(`新規選手「${fullName}」を登録しました！`);
 }

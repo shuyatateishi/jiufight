@@ -50,28 +50,37 @@
     <main>
         <section class="fighters-section">
             <div class="container">
-                <h2 class="section-title">出場選手一覧</h2>
+                <div class="page-header">
+                    <h2 class="section-title">出場選手一覧</h2>
+                    <button id="add-new-fighter-btn" class="btn btn-primary add-fighter-btn">
+                        ➕ 新規選手登録
+                    </button>
+                </div>
                 
                 <!-- Search and Filter -->
                 <div class="search-filter">
-                    <input type="text" id="search-input" placeholder="選手名で検索...">
-                    <select id="belt-filter">
-                        <option value="">全ての帯</option>
-                        <option value="white">白帯</option>
-                        <option value="blue">青帯</option>
-                        <option value="purple">紫帯</option>
-                        <option value="brown">茶帯</option>
-                        <option value="black">黒帯</option>
-                    </select>
-                    <select id="weight-filter">
-                        <option value="">全ての階級</option>
-                        <option value="rooster">ルースター級</option>
-                        <option value="light-feather">ライトフェザー級</option>
-                        <option value="feather">フェザー級</option>
-                        <option value="light">ライト級</option>
-                        <option value="middle">ミドル級</option>
-                        <option value="medium-heavy">ミディアムヘビー級</option>
-                    </select>
+                    <div class="search-container">
+                        <input type="text" id="search-input" class="search-input" placeholder="選手名で検索...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="belt-filter">
+                            <option value="">全ての帯</option>
+                            <option value="white">白帯</option>
+                            <option value="blue">青帯</option>
+                            <option value="purple">紫帯</option>
+                            <option value="brown">茶帯</option>
+                            <option value="black">黒帯</option>
+                        </select>
+                        <select id="weight-filter">
+                            <option value="">全ての階級</option>
+                            <option value="rooster">ルースター級</option>
+                            <option value="light-feather">ライトフェザー級</option>
+                            <option value="feather">フェザー級</option>
+                            <option value="light">ライト級</option>
+                            <option value="middle">ミドル級</option>
+                            <option value="medium-heavy">ミディアムヘビー級</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Fighters Grid -->
@@ -153,6 +162,70 @@
         </div>
     </div>
 
+    <!-- Add New Fighter Modal -->
+    <div id="add-fighter-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>新規選手登録</h2>
+            <form id="add-fighter-form">
+                <div class="form-group">
+                    <label for="new-full-name">本名（フルネーム） <span class="required">*</span></label>
+                    <input type="text" id="new-full-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-nickname">ニックネーム</label>
+                    <input type="text" id="new-nickname" placeholder="例: スマイリー、鉄人など">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-belt">帯色 <span class="required">*</span></label>
+                    <select id="new-belt" required>
+                        <option value="">帯色を選択</option>
+                        <option value="white">白帯</option>
+                        <option value="blue">青帯</option>
+                        <option value="purple">紫帯</option>
+                        <option value="brown">茶帯</option>
+                        <option value="black">黒帯</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-weight">階級 <span class="required">*</span></label>
+                    <select id="new-weight" required>
+                        <option value="">階級を選択</option>
+                        <option value="rooster">ルースター級</option>
+                        <option value="light-feather">ライトフェザー級</option>
+                        <option value="feather">フェザー級</option>
+                        <option value="light">ライト級</option>
+                        <option value="middle">ミドル級</option>
+                        <option value="medium-heavy">ミディアムヘビー級</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-dojo">所属道場 <span class="required">*</span></label>
+                    <input type="text" id="new-dojo" required placeholder="例: YAWARA柔術アカデミー">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-age">年齢</label>
+                    <input type="number" id="new-age" min="1" max="100" placeholder="例: 25">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-bio">プロフィール・経歴</label>
+                    <textarea id="new-bio" rows="3" placeholder="例: 柔術歴3年。アグレッシブなファイトスタイルが持ち味。"></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="save-btn">選手を登録</button>
+                    <button type="button" class="cancel-btn">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>&copy; 2025 Jiufight. All rights reserved.</p>
@@ -174,12 +247,24 @@
     <script>
         // Initialize database sync for fighters
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.databaseSync) {
-                window.databaseSync.onFighterUpdate((updatedFightersData) => {
-                    fightersData = updatedFightersData;
-                    displayFighters();
-                });
-            }
+            console.log('🚀 Fighters page loaded');
+            
+            // Check Firebase connection status
+            setTimeout(() => {
+                if (window.databaseSync) {
+                    console.log('✅ Database sync available');
+                    const status = window.databaseSync.getSyncStatus();
+                    console.log('📊 Sync status:', status);
+                    
+                    window.databaseSync.onFighterUpdate((updatedFightersData) => {
+                        console.log(`🔄 Received fighter update: ${updatedFightersData.length} fighters`);
+                        fightersData = updatedFightersData;
+                        displayFighters();
+                    });
+                } else {
+                    console.log('❌ Database sync not available');
+                }
+            }, 1000);
         });
     </script>
 </body>

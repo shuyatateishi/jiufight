@@ -224,6 +224,9 @@ class DatabaseSync {
     
     // Update fighters data
     async updateFighters(fightersData) {
+        console.log(`🔄 updateFighters called with ${fightersData.length} fighters`);
+        console.log(`📊 Database status: online=${this.isOnline}, db=${!!this.db}`);
+        
         const updateData = {
             data: fightersData,
             timestamp: Date.now(),
@@ -232,6 +235,7 @@ class DatabaseSync {
         
         if (this.db && this.isOnline) {
             try {
+                console.log(`📤 Saving fighters to Firebase...`);
                 await this.db.ref('fighters').set(fightersData);
                 await this.db.ref('metadata/fighters').set({
                     lastUpdate: updateData.timestamp,
@@ -239,11 +243,13 @@ class DatabaseSync {
                     count: fightersData.length
                 });
                 console.log(`✅ Fighters data saved to database (${fightersData.length} fighters)`);
+                console.log(`📱 Device ID: ${this.deviceId}`);
             } catch (error) {
-                console.error('Database update error:', error);
+                console.error('❌ Database update error:', error);
                 this.saveToLocalStorage('fighters', fightersData);
             }
         } else {
+            console.log(`💾 Using localStorage fallback`);
             this.saveToLocalStorage('fighters', fightersData);
         }
         
