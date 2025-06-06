@@ -1424,11 +1424,35 @@ function handleEditSubmit(e) {
             console.log('📤 FORCING database sync...');
             window.databaseSync.updateFighters(fightersData).then(() => {
                 console.log('✅ Database sync completed successfully');
+                
+                // VERIFICATION: Re-check data after 2 seconds
+                setTimeout(() => {
+                    const verifyData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+                    const updatedFighter = verifyData.find(f => f.id === fighterId);
+                    if (updatedFighter && updatedFighter.fullName === updatedFullName) {
+                        console.log('✅ VERIFICATION PASSED: Data persisted correctly');
+                    } else {
+                        console.error('❌ VERIFICATION FAILED: Data not persisted');
+                        // Emergency backup
+                        if (window.emergencySync) {
+                            window.emergencySync.forceBackup();
+                        }
+                    }
+                }, 2000);
+                
             }).catch(error => {
                 console.error('❌ Database sync failed:', error);
+                // Emergency backup
+                if (window.emergencySync) {
+                    window.emergencySync.forceBackup();
+                }
             });
         } else {
             console.warn('⚠️ Database sync not available');
+            // Emergency backup
+            if (window.emergencySync) {
+                window.emergencySync.forceBackup();
+            }
         }
         
         // 3. FORCE update global variables
