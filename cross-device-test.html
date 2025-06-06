@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 別端末間同期テスト - Jiufight</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .device-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 2px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 2px solid #ffeaa7; }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        button:active { transform: translateY(0); }
+        
+        .urgent-btn {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            font-size: 1.1em;
+            padding: 15px 30px;
+        }
+        
+        .log {
+            background: #2d3748;
+            color: #e2e8f0;
+            border: 2px solid #4a5568;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            border-radius: 8px;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .status-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .qr-section {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🌐 別端末間リアルタイム同期テスト</h1>
+            <p>このページで選手データを変更し、他の端末・ブラウザでの反映をテストします</p>
+        </div>
+        
+        <div class="device-info">
+            <h3>📱 現在の端末情報</h3>
+            <div id="device-info">読み込み中...</div>
+        </div>
+        
+        <div class="qr-section">
+            <h3>📱 他の端末でテストする場合</h3>
+            <p>このURLを他の端末・ブラウザで開いてください：</p>
+            <code id="test-url" style="background: #f0f0f0; padding: 10px; border-radius: 5px; display: inline-block;"></code>
+            <br><br>
+            <small>💡 スマートフォン、タブレット、別のPC、別のブラウザなど、異なる端末で開いてテストしてください</small>
+        </div>
+        
+        <div class="test-section">
+            <h2>🚀 クロスデバイス同期テスト</h2>
+            <p>以下のボタンで選手データを変更し、他の端末で即座に反映されるかテストします。</p>
+            
+            <button class="urgent-btn" onclick="performCrossDeviceTest()">
+                🔥 別端末同期テスト実行
+            </button>
+            <button onclick="createTestFighter()">テスト選手作成</button>
+            <button onclick="updateTestFighter()">テスト選手更新</button>
+            <button onclick="deleteTestFighter()">テスト選手削除</button>
+            <button onclick="checkSyncStatus()">同期状態確認</button>
+            <button onclick="forceSyncCheck()">強制同期チェック</button>
+            
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 リアルタイム同期モニター</h2>
+            <div class="status-grid">
+                <div class="status-card">
+                    <h4>🔧 システム状態</h4>
+                    <div id="system-status">確認中...</div>
+                </div>
+                <div class="status-card">
+                    <h4>👥 選手データ</h4>
+                    <div id="fighter-status">確認中...</div>
+                </div>
+                <div class="status-card">
+                    <h4>⏱️ 最終更新</h4>
+                    <div id="last-update">確認中...</div>
+                </div>
+                <div class="status-card">
+                    <h4>🌐 同期マーカー</h4>
+                    <div id="sync-marker">確認中...</div>
+                </div>
+            </div>
+            
+            <button onclick="startRealtimeMonitor()">📡 リアルタイム監視開始</button>
+            <button onclick="stopRealtimeMonitor()">⏹️ 監視停止</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📝 ログ</h2>
+            <div id="test-log" class="log"></div>
+            <button onclick="clearLog()">ログクリア</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📚 テスト手順</h2>
+            <ol>
+                <li><strong>複数端末でこのページを開く</strong> - PC、スマートフォン、タブレットなど</li>
+                <li><strong>一つの端末で「別端末同期テスト実行」をクリック</strong></li>
+                <li><strong>他の端末で変更が即座に反映されるか確認</strong></li>
+                <li><strong>選手一覧ページやランキングページでも確認</strong></li>
+                <li><strong>双方向テスト</strong> - 各端末から変更して相互反映をチェック</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="realtime-sync.js"></script>
+    <script>
+        let testLog = [];
+        let monitorInterval = null;
+        let updateCount = 0;
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            testLog.push(logEntry);
+            
+            const logElement = document.getElementById('test-log');
+            logElement.textContent = testLog.join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        function showResult(message, type) {
+            const results = document.getElementById('test-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            results.appendChild(resultDiv);
+            
+            // 最新の結果だけ残す（最大5件）
+            const allResults = results.children;
+            if (allResults.length > 5) {
+                results.removeChild(allResults[0]);
+            }
+        }
+        
+        // 初期化
+        function initialize() {
+            log('別端末間同期テストを初期化中...');
+            
+            // 現在のURLを表示
+            document.getElementById('test-url').textContent = window.location.href;
+            
+            // デバイス情報表示
+            updateDeviceInfo();
+            
+            // リアルタイム同期システムの状態確認
+            if (window.realtimeSync) {
+                log('✅ リアルタイム同期システムが利用可能');
+                
+                // 選手データ更新の監視
+                window.realtimeSync.onFighterUpdate((updatedData) => {
+                    log(`🔄 選手データ更新を検知! 選手数: ${updatedData.length}`);
+                    showResult(`🔄 リアルタイム更新検知: ${updatedData.length}人の選手データ`, 'success');
+                    updateStatusCards();
+                });
+                
+                updateStatusCards();
+            } else {
+                log('❌ リアルタイム同期システムが見つかりません');
+                showResult('❌ リアルタイム同期システムエラー', 'error');
+            }
+        }
+        
+        function updateDeviceInfo() {
+            const deviceInfo = {
+                userAgent: navigator.userAgent,
+                deviceId: window.realtimeSync ? window.realtimeSync.deviceId : '不明',
+                timestamp: new Date().toLocaleString(),
+                syncSupport: !!window.realtimeSync
+            };
+            
+            document.getElementById('device-info').innerHTML = `
+                <strong>端末ID:</strong> ${deviceInfo.deviceId}<br>
+                <strong>ブラウザ:</strong> ${getBrowserInfo()}<br>
+                <strong>同期システム:</strong> ${deviceInfo.syncSupport ? '✅ 利用可能' : '❌ 利用不可'}<br>
+                <strong>接続時刻:</strong> ${deviceInfo.timestamp}
+            `;
+        }
+        
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome')) return 'Google Chrome';
+            if (ua.includes('Firefox')) return 'Mozilla Firefox';
+            if (ua.includes('Safari')) return 'Safari';
+            if (ua.includes('Edge')) return 'Microsoft Edge';
+            return 'その他のブラウザ';
+        }
+        
+        function updateStatusCards() {
+            if (!window.realtimeSync) return;
+            
+            const status = window.realtimeSync.getSyncStatus();
+            
+            document.getElementById('system-status').innerHTML = `
+                端末ID: ${status.deviceId}<br>
+                ✅ システム正常動作中
+            `;
+            
+            document.getElementById('fighter-status').innerHTML = `
+                選手数: ${status.localStorageData.fighters.count}人<br>
+                データサイズ: ${(JSON.stringify(localStorage.getItem('fightersData') || '[]').length / 1024).toFixed(1)}KB
+            `;
+            
+            const lastUpdate = status.localStorageData.fighters.timestamp 
+                ? new Date(parseInt(status.localStorageData.fighters.timestamp)).toLocaleString()
+                : '未更新';
+            document.getElementById('last-update').textContent = lastUpdate;
+            
+            const syncMarker = status.localStorageData.fighters.syncMarker;
+            if (syncMarker) {
+                try {
+                    const marker = JSON.parse(syncMarker);
+                    document.getElementById('sync-marker').innerHTML = `
+                        更新端末: ${marker.deviceId}<br>
+                        同期時刻: ${new Date(marker.timestamp).toLocaleTimeString()}
+                    `;
+                } catch (e) {
+                    document.getElementById('sync-marker').textContent = 'エラー';
+                }
+            }
+        }
+        
+        // メインテスト実行
+        function performCrossDeviceTest() {
+            log('🔥 別端末間同期テスト開始');
+            showResult('🚀 別端末同期テストを実行中...', 'info');
+            
+            if (!window.realtimeSync) {
+                showResult('❌ リアルタイム同期システムが利用できません', 'error');
+                return;
+            }
+            
+            // テスト用選手データを作成
+            const testFighter = {
+                id: 88888,
+                name: `クロスデバイステスト選手`,
+                nickname: `端末間同期テスター_${Date.now()}`,
+                belt: 'black',
+                weight: 'light',
+                dojo: `${window.realtimeSync.deviceId}_道場`,
+                wins: 777,
+                losses: 0,
+                bio: `別端末間同期のテスト用選手 - 作成端末: ${window.realtimeSync.deviceId}`,
+                fullName: `クロスデバイス太郎_${updateCount++}`,
+                age: '25',
+                occupation: '同期テスター',
+                location: `${getBrowserInfo()}ブラウザ`,
+                experience: '端末間同期歴1秒',
+                specialty: 'リアルタイム同期',
+                characteristic: '瞬時に他端末に現れる',
+                motivation: '全端末で同期されたい！',
+                testTimestamp: new Date().toISOString(),
+                deviceOrigin: window.realtimeSync.deviceId
+            };
+            
+            // 既存データ取得
+            let fightersData = [];
+            const existingData = localStorage.getItem('fightersData');
+            if (existingData) {
+                fightersData = JSON.parse(existingData);
+            }
+            
+            // テスト選手を追加/更新
+            const existingIndex = fightersData.findIndex(f => f.id === 88888);
+            if (existingIndex >= 0) {
+                fightersData[existingIndex] = testFighter;
+                log('クロスデバイステスト選手を更新');
+            } else {
+                fightersData.push(testFighter);
+                log('クロスデバイステスト選手を追加');
+            }
+            
+            // リアルタイム同期で保存
+            window.realtimeSync.updateFighters(fightersData);
+            
+            log(`✅ テスト選手「${testFighter.nickname}」を保存完了`);
+            showResult(`✅ テスト選手を作成・更新しました！他の端末で確認してください`, 'success');
+            
+            updateStatusCards();
+        }
+        
+        function createTestFighter() {
+            performCrossDeviceTest();
+        }
+        
+        function updateTestFighter() {
+            log('テスト選手を更新中...');
+            
+            let fightersData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            const testFighter = fightersData.find(f => f.id === 88888);
+            
+            if (testFighter) {
+                testFighter.nickname = `更新テスター_${Date.now()}`;
+                testFighter.motivation = `${new Date().toLocaleTimeString()}に更新されました！`;
+                testFighter.wins = testFighter.wins + 1;
+                
+                window.realtimeSync.updateFighters(fightersData);
+                log('✅ テスト選手を更新しました');
+                showResult('✅ テスト選手を更新しました', 'success');
+            } else {
+                log('⚠️ テスト選手が見つかりません');
+                showResult('⚠️ テスト選手が見つかりません。先に作成してください', 'warning');
+            }
+        }
+        
+        function deleteTestFighter() {
+            log('テスト選手を削除中...');
+            
+            let fightersData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            const originalLength = fightersData.length;
+            fightersData = fightersData.filter(f => f.id !== 88888);
+            
+            if (fightersData.length < originalLength) {
+                window.realtimeSync.updateFighters(fightersData);
+                log('✅ テスト選手を削除しました');
+                showResult('✅ テスト選手を削除しました', 'success');
+            } else {
+                log('⚠️ 削除するテスト選手が見つかりませんでした');
+                showResult('⚠️ 削除するテスト選手が見つかりませんでした', 'info');
+            }
+        }
+        
+        function checkSyncStatus() {
+            if (!window.realtimeSync) {
+                showResult('❌ リアルタイム同期システムが利用できません', 'error');
+                return;
+            }
+            
+            const status = window.realtimeSync.getSyncStatus();
+            log('現在の同期状態:');
+            log(JSON.stringify(status, null, 2));
+            showResult(`📊 同期状態をログに出力しました`, 'info');
+            updateStatusCards();
+        }
+        
+        function forceSyncCheck() {
+            if (!window.realtimeSync) {
+                showResult('❌ リアルタイム同期システムが利用できません', 'error');
+                return;
+            }
+            
+            window.realtimeSync.forceSyncCheck();
+            showResult('🔄 強制同期チェックを実行しました', 'info');
+            updateStatusCards();
+        }
+        
+        function startRealtimeMonitor() {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+            }
+            
+            monitorInterval = setInterval(() => {
+                updateStatusCards();
+            }, 1000);
+            
+            log('📡 リアルタイム監視を開始しました');
+            showResult('📡 リアルタイム監視開始', 'info');
+        }
+        
+        function stopRealtimeMonitor() {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+                monitorInterval = null;
+            }
+            
+            log('⏹️ リアルタイム監視を停止しました');
+            showResult('⏹️ リアルタイム監視停止', 'info');
+        }
+        
+        function clearLog() {
+            testLog = [];
+            document.getElementById('test-log').textContent = '';
+            document.getElementById('test-results').innerHTML = '';
+        }
+        
+        // 初期化実行
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initialize, 500);
+            
+            // 自動監視開始
+            setTimeout(startRealtimeMonitor, 1000);
+        });
+        
+        // ページ離脱時のクリーンアップ
+        window.addEventListener('beforeunload', () => {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+            }
+        });
+    </script>
+</body>
+</html>

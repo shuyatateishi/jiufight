@@ -122,26 +122,51 @@ function testSyncListener() {
     return true;
 }
 
-// Test 5: Cross-tab simulation
-function testCrossTab() {
-    console.log('\n📋 Test 5: 別タブシミュレーションテスト');
+// Test 5: Cross-device simulation
+function testCrossDevice() {
+    console.log('\n📋 Test 5: 別端末間同期テスト');
     
     if (!window.realtimeSync) {
         console.log('❌ RealtimeSync システムが利用できません');
         return false;
     }
     
-    console.log('🔄 BroadcastChannel経由でテストメッセージ送信...');
+    console.log('🌐 別端末間同期のテスト実行中...');
     
-    // Simulate cross-tab update
-    window.realtimeSync.channels.fighters.postMessage({
-        type: 'update',
-        timestamp: Date.now(),
-        testMessage: 'Cross-tab test from console'
-    });
+    // Create cross-device test data
+    const testData = {
+        id: 77777,
+        name: 'クロスデバイステスト選手',
+        nickname: `別端末テスター_${Date.now()}`,
+        belt: 'purple',
+        weight: 'light',
+        dojo: `${window.realtimeSync.deviceId}_テスト道場`,
+        wins: 999,
+        losses: 0,
+        bio: `別端末間同期テスト - 端末ID: ${window.realtimeSync.deviceId}`,
+        testTimestamp: new Date().toISOString(),
+        deviceOrigin: window.realtimeSync.deviceId
+    };
     
-    console.log('✅ テストメッセージを送信しました');
-    console.log('💡 他のタブでも同じリスナーが動作していれば、更新を受信するはずです');
+    // Add to existing data
+    let fightersData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+    const existingIndex = fightersData.findIndex(f => f.id === 77777);
+    
+    if (existingIndex >= 0) {
+        fightersData[existingIndex] = testData;
+        console.log('🔄 テスト選手を更新');
+    } else {
+        fightersData.push(testData);
+        console.log('➕ テスト選手を追加');
+    }
+    
+    // Update with cross-device sync
+    window.realtimeSync.updateFighters(fightersData);
+    
+    console.log('✅ 別端末間同期テストデータを送信しました');
+    console.log(`📱 端末ID: ${window.realtimeSync.deviceId}`);
+    console.log('💡 他の端末・ブラウザでも同じテストを実行して、相互同期を確認してください');
+    console.log('🔍 同期状態確認: window.realtimeSync.getSyncStatus()');
     
     return true;
 }
@@ -215,7 +240,7 @@ function runAllTests() {
     if (results.systemAvailable) {
         results.listenerWorks = testSyncListener();
         results.updateWorks = !!testFighterUpdate();
-        results.crossTabWorks = testCrossTab();
+        results.crossDeviceWorks = testCrossDevice();
         results.persistenceWorks = testPersistence();
     }
     
@@ -225,7 +250,7 @@ function runAllTests() {
     console.log(`既存データ: ${results.dataExists ? '✅' : '⚠️'}`);
     console.log(`更新機能: ${results.updateWorks ? '✅' : '❌'}`);
     console.log(`リスナー: ${results.listenerWorks ? '✅' : '❌'}`);
-    console.log(`別タブ同期: ${results.crossTabWorks ? '✅' : '❌'}`);
+    console.log(`別端末同期: ${results.crossDeviceWorks ? '✅' : '❌'}`);
     console.log(`永続化: ${results.persistenceWorks ? '✅' : '⚠️'}`);
     
     console.log('\n💡 次のステップ:');
@@ -243,7 +268,7 @@ window.jiufightTest = {
     testExistingData,
     testFighterUpdate,
     testSyncListener,
-    testCrossTab,
+    testCrossDevice,
     testPersistence,
     cleanupTestData
 };
