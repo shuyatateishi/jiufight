@@ -1,0 +1,10 @@
+FORCE DEPLOYMENT
+Timestamp: 2025-06-07 08:15:00
+Reason: Cache invalidation and forced deployment
+Changes:
+- Fixed modal auto-open issue
+- Fixed header title to "Jiufight"
+- Added cache busting parameters
+- Disabled all caching in Vercel config
+
+This file forces a new deployment to ensure changes are reflected.
