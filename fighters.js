@@ -1374,36 +1374,66 @@ function handleEditSubmit(e) {
     e.preventDefault();
     
     console.log('🔄 CRITICAL: Edit form submitted');
+    if (window.debugFighters) window.debugFighters.log('📤 FORM SUBMIT STARTED', 'warn');
     
     const fighterId = parseInt(document.getElementById('edit-fighter-id').value);
     const fighter = fightersData.find(f => f.id === fighterId);
     
     if (!fighter) {
         console.error('❌ Fighter not found:', fighterId);
+        if (window.debugFighters) window.debugFighters.log(`❌ Fighter ID ${fighterId} not found`, 'error');
         alert('エラー: 選手が見つかりません');
         return;
     }
     
     console.log(`📝 Editing fighter: ${fighter.name} (ID: ${fighterId})`);
+    if (window.debugFighters) window.debugFighters.log(`📝 Editing: ${fighter.name}`, 'info');
     
     // CRITICAL: Update fighter data with FORCED values
     const updatedFullName = document.getElementById('edit-full-name').value.trim();
     const updatedNickname = document.getElementById('edit-nickname').value.trim();
+    const updatedAge = document.getElementById('edit-age').value.trim();
+    const updatedOccupation = document.getElementById('edit-occupation').value.trim();
+    const updatedLocation = document.getElementById('edit-location').value.trim();
+    const updatedExperience = document.getElementById('edit-experience').value.trim();
+    const updatedSpecialty = document.getElementById('edit-specialty').value.trim();
+    const updatedCharacteristic = document.getElementById('edit-characteristic').value.trim();
+    const updatedMotivation = document.getElementById('edit-motivation').value.trim();
     
     console.log('📝 Form values:');
     console.log(`  - Full Name: "${updatedFullName}"`);
     console.log(`  - Nickname: "${updatedNickname}"`);
+    console.log(`  - Age: "${updatedAge}"`);
+    console.log(`  - Occupation: "${updatedOccupation}"`);
+    console.log(`  - Location: "${updatedLocation}"`);
+    
+    if (window.debugFighters) {
+        window.debugFighters.log(`📝 Form: ${updatedFullName} | ${updatedNickname}`, 'info');
+    }
+    
+    // STORE ORIGINAL VALUES FOR COMPARISON
+    const originalValues = {
+        fullName: fighter.fullName,
+        nickname: fighter.nickname,
+        age: fighter.age,
+        occupation: fighter.occupation,
+        location: fighter.location,
+        experience: fighter.experience,
+        specialty: fighter.specialty,
+        characteristic: fighter.characteristic,
+        motivation: fighter.motivation
+    };
     
     // FORCE UPDATE ALL FIELDS
     fighter.fullName = updatedFullName;
     fighter.nickname = updatedNickname;
-    fighter.age = document.getElementById('edit-age').value.trim();
-    fighter.occupation = document.getElementById('edit-occupation').value.trim();
-    fighter.location = document.getElementById('edit-location').value.trim();
-    fighter.experience = document.getElementById('edit-experience').value.trim();
-    fighter.specialty = document.getElementById('edit-specialty').value.trim();
-    fighter.characteristic = document.getElementById('edit-characteristic').value.trim();
-    fighter.motivation = document.getElementById('edit-motivation').value.trim();
+    fighter.age = updatedAge;
+    fighter.occupation = updatedOccupation;
+    fighter.location = updatedLocation;
+    fighter.experience = updatedExperience;
+    fighter.specialty = updatedSpecialty;
+    fighter.characteristic = updatedCharacteristic;
+    fighter.motivation = updatedMotivation;
     
     // FORCE UPDATE name if fullName was changed
     if (updatedFullName && !fighter.name.includes('（')) {
@@ -1411,37 +1441,75 @@ function handleEditSubmit(e) {
     }
     
     console.log('✅ Fighter data updated locally:', fighter);
+    if (window.debugFighters) {
+        window.debugFighters.log('✅ Local data updated', 'success');
+    }
     
     // CRITICAL: Multiple save methods to guarantee persistence
     try {
         // 1. FORCE save to localStorage IMMEDIATELY
+        const saveTimestamp = Date.now();
         localStorage.setItem('fightersData', JSON.stringify(fightersData));
-        localStorage.setItem('fightersData_timestamp', Date.now().toString());
+        localStorage.setItem('fightersData_timestamp', saveTimestamp.toString());
         console.log('💾 FORCED localStorage save completed');
+        if (window.debugFighters) {
+            window.debugFighters.log(`💾 localStorage saved: ${saveTimestamp}`, 'success');
+        }
+        
+        // IMMEDIATE VERIFICATION - Check if the save actually worked
+        const immediateVerify = JSON.parse(localStorage.getItem('fightersData') || '[]');
+        const savedFighter = immediateVerify.find(f => f.id === fighterId);
+        if (savedFighter && savedFighter.fullName === updatedFullName) {
+            console.log('✅ IMMEDIATE VERIFICATION PASSED: localStorage save successful');
+            if (window.debugFighters) {
+                window.debugFighters.log('✅ localStorage verification OK', 'success');
+            }
+        } else {
+            console.error('❌ IMMEDIATE VERIFICATION FAILED: localStorage save failed');
+            if (window.debugFighters) {
+                window.debugFighters.log('❌ localStorage verification FAILED', 'error');
+            }
+        }
         
         // 2. FORCE save to database with verification
         if (window.databaseSync) {
             console.log('📤 FORCING database sync...');
+            if (window.debugFighters) {
+                window.debugFighters.log('📤 Starting Firebase sync...', 'warn');
+            }
+            
             window.databaseSync.updateFighters(fightersData).then(() => {
                 console.log('✅ Database sync completed successfully');
+                if (window.debugFighters) {
+                    window.debugFighters.log('✅ Firebase sync completed', 'success');
+                }
                 
-                // VERIFICATION: Re-check data after 2 seconds
+                // VERIFICATION: Re-check data after 3 seconds
                 setTimeout(() => {
                     const verifyData = JSON.parse(localStorage.getItem('fightersData') || '[]');
                     const updatedFighter = verifyData.find(f => f.id === fighterId);
                     if (updatedFighter && updatedFighter.fullName === updatedFullName) {
-                        console.log('✅ VERIFICATION PASSED: Data persisted correctly');
+                        console.log('✅ DELAYED VERIFICATION PASSED: Data persisted correctly');
+                        if (window.debugFighters) {
+                            window.debugFighters.log('✅ Delayed verification OK', 'success');
+                        }
                     } else {
-                        console.error('❌ VERIFICATION FAILED: Data not persisted');
+                        console.error('❌ DELAYED VERIFICATION FAILED: Data not persisted');
+                        if (window.debugFighters) {
+                            window.debugFighters.log('❌ Delayed verification FAILED', 'error');
+                        }
                         // Emergency backup
                         if (window.emergencySync) {
                             window.emergencySync.forceBackup();
                         }
                     }
-                }, 2000);
+                }, 3000);
                 
             }).catch(error => {
                 console.error('❌ Database sync failed:', error);
+                if (window.debugFighters) {
+                    window.debugFighters.log(`❌ Firebase sync failed: ${error.message}`, 'error');
+                }
                 // Emergency backup
                 if (window.emergencySync) {
                     window.emergencySync.forceBackup();
@@ -1449,6 +1517,9 @@ function handleEditSubmit(e) {
             });
         } else {
             console.warn('⚠️ Database sync not available');
+            if (window.debugFighters) {
+                window.debugFighters.log('⚠️ No Firebase sync available', 'warn');
+            }
             // Emergency backup
             if (window.emergencySync) {
                 window.emergencySync.forceBackup();
@@ -1460,21 +1531,36 @@ function handleEditSubmit(e) {
         window.filteredFighters = [...fightersData];
         
         console.log('✅ ALL SAVE METHODS COMPLETED');
+        if (window.debugFighters) {
+            window.debugFighters.log('✅ ALL SAVE METHODS COMPLETED', 'success');
+        }
         
         // Close modal IMMEDIATELY
         document.getElementById('edit-modal').style.display = 'none';
+        if (window.debugFighters) {
+            window.debugFighters.log('🎭 Edit modal closed', 'info');
+        }
         
         // Force refresh display
         displayFighters();
+        if (window.debugFighters) {
+            window.debugFighters.log('🔄 Display refreshed', 'info');
+        }
         
         // Show success message only
         setTimeout(() => {
             alert(`✅ ${fighter.name}のプロフィールが正常に更新されました！`);
+            if (window.debugFighters) {
+                window.debugFighters.log('✅ Success message shown', 'success');
+            }
             // DON'T auto-open profile again - user can click manually if needed
         }, 300);
         
     } catch (error) {
         console.error('❌ CRITICAL SAVE ERROR:', error);
+        if (window.debugFighters) {
+            window.debugFighters.log(`❌ SAVE ERROR: ${error.message}`, 'error');
+        }
         alert('❌ 保存エラーが発生しました。もう一度お試しください。');
     }
 }
