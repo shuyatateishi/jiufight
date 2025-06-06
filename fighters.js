@@ -19,6 +19,15 @@ function loadSavedData() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // ULTIMATE INSURANCE: Fix header title immediately
+    setTimeout(() => {
+        const logo = document.querySelector('.logo');
+        if (logo && logo.textContent !== 'Jiufight') {
+            logo.textContent = 'Jiufight';
+            console.log('🚨 FORCED HEADER FIX: Changed to Jiufight');
+        }
+    }, 50);
+    
     // CRITICAL: Force close all modals IMMEDIATELY on page load
     setTimeout(() => {
         const modals = ['fighter-modal', 'edit-modal', 'add-fighter-modal'];
@@ -27,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal) {
                 modal.classList.remove('show');
                 modal.style.display = 'none';
+                modal.style.setProperty('display', 'none', 'important');
                 console.log(`🚨 FORCED CLOSE: ${modalId}`);
             }
         });
@@ -54,11 +64,81 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal && (modal.style.display === 'block' || modal.style.display === 'flex' || modal.classList.contains('show'))) {
                 modal.classList.remove('show');
                 modal.style.display = 'none';
+                modal.style.setProperty('display', 'none', 'important');
                 console.log(`🚨 SAFETY CLOSE: ${modalId} was unexpectedly open`);
             }
         });
+        
+        // ULTIMATE HEADER FIX SAFETY
+        const logo = document.querySelector('.logo');
+        if (logo && logo.textContent !== 'Jiufight') {
+            logo.textContent = 'Jiufight';
+            console.log('🚨 SAFETY HEADER FIX: Changed to Jiufight');
+        }
     }, 1000);
+    
+    // CONTINUOUS MONITORING: Check every 5 seconds for issues
+    setInterval(() => {
+        // Monitor modal state
+        const modals = ['fighter-modal', 'edit-modal', 'add-fighter-modal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && (modal.style.display === 'block' || modal.style.display === 'flex')) {
+                console.log(`⚠️ MODAL MONITOR: ${modalId} is unexpectedly open`);
+            }
+        });
+        
+        // Monitor header
+        const logo = document.querySelector('.logo');
+        if (logo && logo.textContent !== 'Jiufight') {
+            console.log('⚠️ HEADER MONITOR: Header is not "Jiufight"');
+        }
+    }, 5000);
 });
+
+// EMERGENCY MANUAL FIX COMMANDS - User can run these in browser console
+window.emergencyFix = {
+    closeAllModals: function() {
+        const modals = ['fighter-modal', 'edit-modal', 'add-fighter-modal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.style.setProperty('display', 'none', 'important');
+            }
+        });
+        console.log('✅ All modals forcibly closed');
+    },
+    
+    fixHeader: function() {
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.textContent = 'Jiufight';
+            console.log('✅ Header fixed to "Jiufight"');
+        }
+    },
+    
+    reloadFighters: function() {
+        if (typeof displayFighters === 'function') {
+            displayFighters();
+            console.log('✅ Fighters display reloaded');
+        }
+    },
+    
+    fixAll: function() {
+        this.closeAllModals();
+        this.fixHeader();
+        this.reloadFighters();
+        console.log('✅ All emergency fixes applied');
+    }
+};
+
+console.log('🆘 EMERGENCY COMMANDS AVAILABLE:');
+console.log('  emergencyFix.closeAllModals() - Close all modals');
+console.log('  emergencyFix.fixHeader() - Fix header to "Jiufight"');
+console.log('  emergencyFix.reloadFighters() - Reload fighters display');
+console.log('  emergencyFix.fixAll() - Apply all fixes');
 
 // Event listeners
 function initializeEventListeners() {
@@ -1589,13 +1669,17 @@ function handleEditSubmit(e) {
             window.debugFighters.log('🔄 Display refreshed', 'info');
         }
         
-        // Show success message only
+        // Show success message and force page reload for ultimate reliability
         setTimeout(() => {
-            alert(`✅ ${fighter.name}のプロフィールが正常に更新されました！`);
+            alert(`✅ ${fighter.name}のプロフィールが正常に更新されました！\n\nページを更新して最新データを表示します。`);
             if (window.debugFighters) {
                 window.debugFighters.log('✅ Success message shown', 'success');
             }
-            // DON'T auto-open profile again - user can click manually if needed
+            
+            // ULTIMATE INSURANCE: Force page reload to ensure data is displayed
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }, 300);
         
     } catch (error) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Buster: 20250607-081500 -->
+    <!-- Cache Buster: 20250607-082000 -->
     <title>🥊 選手一覧 - Super Yawara Cup 2025 | 全49名の出場選手プロフィール</title>
     <meta name="description" content="第2回 Super Yawara Cup 2025に出場する全49名の選手プロフィール。白帯から黒帯まで、各階級のトップファイターたちの詳細情報をチェック！">
     <meta name="keywords" content="柔術選手,BJJ選手,ファイタープロフィール,階級別,帯別,YAWARA柔術アカデミー,FHR">
@@ -23,8 +23,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥋</text></svg>">
     
-    <link rel="stylesheet" href="styles-v2.css?v=20250607-081500">
-    <link rel="stylesheet" href="fighters-v2.css?v=20250607-081500">
+    <link rel="stylesheet" href="styles-v2.css?v=20250607-082000">
+    <link rel="stylesheet" href="fighters-v2.css?v=20250607-082000">
 </head>
 <body>
     <header>
@@ -93,7 +93,7 @@
     </main>
 
     <!-- Fighter Profile Modal -->
-    <div id="fighter-modal" class="modal">
+    <div id="fighter-modal" class="modal" style="display: none !important;">
         <div class="modal-content">
             <span class="close">&times;</span>
             <div id="fighter-profile">
@@ -103,7 +103,7 @@
     </div>
 
     <!-- Edit Profile Modal -->
-    <div id="edit-modal" class="modal">
+    <div id="edit-modal" class="modal" style="display: none !important;">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>プロフィール編集</h2>
@@ -164,7 +164,7 @@
     </div>
 
     <!-- Add New Fighter Modal -->
-    <div id="add-fighter-modal" class="modal">
+    <div id="add-fighter-modal" class="modal" style="display: none !important;">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>新規選手登録</h2>
@@ -238,19 +238,19 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <!-- Firebase Configuration -->
-    <script src="firebase-config.js?v=20250607-081500"></script>
+    <script src="firebase-config.js?v=20250607-082000"></script>
     
     <!-- Database Sync System -->
-    <script src="database-sync.js?v=20250607-081500"></script>
+    <script src="database-sync.js?v=20250607-082000"></script>
     
     <!-- Emergency Sync System - ABSOLUTE BACKUP -->
-    <script src="emergency-sync.js?v=20250607-081500"></script>
+    <script src="emergency-sync.js?v=20250607-082000"></script>
     
     <!-- Debug System - PROBLEM INVESTIGATION -->
-    <script src="debug-fighters.js?v=20250607-081500"></script>
+    <script src="debug-fighters.js?v=20250607-082000"></script>
     
-    <script src="script.js?v=20250607-081500"></script>
-    <script src="fighters.js?v=20250607-081500"></script>
+    <script src="script.js?v=20250607-082000"></script>
+    <script src="fighters.js?v=20250607-082000"></script>
     <script>
         // Initialize database sync for fighters
         document.addEventListener('DOMContentLoaded', () => {
