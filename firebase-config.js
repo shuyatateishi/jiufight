@@ -4,15 +4,16 @@
  * Optimized for Vercel deployment
  */
 
-// Firebase configuration - Replace with your actual values
+// Firebase configuration - Live production config
 const firebaseConfig = {
-    apiKey: "AIzaSyDYOURKEY", // 後で実際のキーに置き換え
-    authDomain: "jiufight.firebaseapp.com",
-    databaseURL: "https://jiufight-default-rtdb.firebaseio.com",
-    projectId: "jiufight",
-    storageBucket: "jiufight.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
+    apiKey: "AIzaSyCovPI3FuL8dIvCkaQTOOO3VcRQEqpMo00",
+    authDomain: "jiufight-20836.firebaseapp.com",
+    databaseURL: "https://jiufight-20836-default-rtdb.firebaseio.com",
+    projectId: "jiufight-20836",
+    storageBucket: "jiufight-20836.firebasestorage.app",
+    messagingSenderId: "977988247154",
+    appId: "1:977988247154:web:82e43c0d6804c0c20daceb",
+    measurementId: "G-5S9SRB6F5J"
 };
 
 // Check if Firebase is loaded
