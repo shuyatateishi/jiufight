@@ -645,8 +645,7 @@ function loadFightersData() {
             bio: 'ミディアムヘビー級1位の紫帯ファイター。',
             achievements: '-',
             style: '-',
-            matchHistory: [],
-            image: 'images/fighters/LINE_ALBUM_対戦カード_250606_1.jpg'
+            matchHistory: []
         },
         {
             id: 2,
@@ -760,8 +759,7 @@ function loadFightersData() {
             bio: 'ライト級1位の黒帯チャンピオン。⭐️マーク付きの実力者。',
             achievements: '⭐️チャンピオン',
             style: '-',
-            matchHistory: [],
-            image: 'images/fighters/LINE_ALBUM_対戦カード_250606_9.jpg'
+            matchHistory: []
         },
         {
             id: 10,
@@ -1279,12 +1277,7 @@ function showFighterProfile(fighterId) {
     
     const profileHtml = `
         <div class="fighter-profile">
-            <div class="profile-image">
-                ${fighter.image ? 
-                    `<img src="${fighter.image}" alt="${fighter.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                    (fighter.nickname || fighter.name).charAt(0)
-                }
-            </div>
+            <div class="profile-image"></div>
             <h2 class="profile-name">${fighter.nickname || fighter.name}</h2>
             ${fighter.nickname ? `<p class="profile-real-name">${fighter.name}</p>` : ''}
             <div class="profile-details">

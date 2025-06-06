@@ -61,15 +61,15 @@
 
                     <!-- ライト級 -->
                     <div class="weight-class-card">
-                        <h3 class="weight-class-title">ライト級</h3>
+                        <h3 class="weight-class-title">ライト級（第2回大会出場者）</h3>
                         <ol class="ranking-list">
-                            <li><span class="rank-number">1</span><span class="fighter-name clickable" onclick="showFighterProfile('松木 フェルナンド')">松木 フェルナンド</span><span class="belt-badge black">黒</span><span class="champion-star">⭐️</span></li>
-                            <li><span class="rank-number">2</span><span class="fighter-name clickable" onclick="showFighterProfile('原田 大樹')">原田 大樹</span><span class="belt-badge black">黒</span></li>
-                            <li><span class="rank-number">3</span><span class="fighter-name clickable" onclick="showFighterProfile('田邊 大吾')">田邊 大吾</span><span class="belt-badge blue">青</span></li>
-                            <li><span class="rank-number">4</span><span class="fighter-name clickable" onclick="showFighterProfile('kentaroh Awata')">kentaroh Awata</span><span class="belt-badge blue">青</span></li>
-                            <li><span class="rank-number">5</span><span class="fighter-name clickable" onclick="showFighterProfile('岡島 悠裕')">岡島 悠裕</span><span class="belt-badge blue">青</span></li>
+                            <li><span class="rank-number">1</span><span class="fighter-name clickable" onclick="showFighterProfile('巨人なるガラ')">巨人なるガラ</span><span class="belt-badge blue">青</span></li>
+                            <li><span class="rank-number">2</span><span class="fighter-name clickable" onclick="showFighterProfile('ドクターオーパスワンやなちゃん')">ドクターオーパスワンやなちゃん</span><span class="belt-badge blue">青</span></li>
+                            <li><span class="rank-number">3</span><span class="fighter-name clickable" onclick="showFighterProfile('Yawaraのヤングボーイぬっきー')">Yawaraのヤングボーイぬっきー</span><span class="belt-badge blue">青</span></li>
+                            <li><span class="rank-number">4</span><span class="fighter-name clickable" onclick="showFighterProfile('HONDAの開発番長コウシ')">HONDAの開発番長コウシ</span><span class="belt-badge blue">青</span></li>
+                            <li><span class="rank-number">5</span><span class="fighter-name clickable" onclick="showFighterProfile('華麗なる新人鈴木')">華麗なる新人鈴木</span><span class="belt-badge white">白</span></li>
                         </ol>
-                        <a href="fighters.html?weight=light" class="more-fighters">続きを見る (5人)</a>
+                        <a href="fighters.html?weight=light" class="more-fighters">続きを見る</a>
                     </div>
 
                     <!-- フェザー級 -->
@@ -143,15 +143,97 @@
     </footer>
 
     <script src="script.js"></script>
-    <script src="fighters.js"></script>
-    <script src="rankings.js"></script>
     <script>
+        // Initialize fighters data for ranking page
+        let fightersData = [];
+        
+        // Load fighters data (simplified version for rankings page)
+        function loadFightersData() {
+            fightersData = [
+                // ミディアムヘビー級
+                { id: 1, name: '三木 善靖', nickname: '', belt: 'purple', weight: 'medium-heavy', dojo: 'FHR', wins: 0, losses: 0, bio: 'ミディアムヘビー級1位の紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_10.jpg' },
+                { id: 2, name: '佐藤 篤史', nickname: '', belt: 'blue', weight: 'medium-heavy', dojo: 'FHR', wins: 0, losses: 0, bio: 'ミディアムヘビー級2位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_10.jpg' },
+                { id: 3, name: '宮本 博之', nickname: 'いにしえのドリーマー宮本', belt: 'blue', weight: 'medium-heavy', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ミディアムヘビー級3位。ニックネームの通り、夢を追い続けるファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_5.jpg' },
+                
+                // ミドル級  
+                { id: 4, name: 'Hideki Da Silva', nickname: 'Hi', belt: 'brown', weight: 'middle', dojo: 'FHR', wins: 0, losses: 0, bio: 'ミドル級1位のFHR所属茶帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_8.jpg' },
+                { id: 5, name: 'サコ', nickname: '', belt: 'blue', weight: 'middle', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ミドル級2位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_7.jpg' },
+                { id: 6, name: '岩月 穂波', nickname: '', belt: 'white', weight: 'middle', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ミドル級3位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_9.jpg' },
+                { id: 7, name: '中路 拓也', nickname: '', belt: 'white', weight: 'middle', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ミドル級4位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_9.jpg' },
+                { id: 8, name: '井柳 俊紀', nickname: '', belt: 'white', weight: 'middle', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ミドル級5位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_7.jpg' },
+                
+                // ライト級（第2回大会出場者）
+                { id: 101, name: '巨人なるガラ', nickname: '巨人なるガラ', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_2.jpg' },
+                { id: 102, name: 'ドクターオーパスワンやなちゃん', nickname: 'ドクターオーパスワンやなちゃん', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_2.jpg' },
+                { id: 103, name: 'Yawaraのヤングボーイぬっきー', nickname: 'Yawaraのヤングボーイぬっきー', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_1.jpg' },
+                { id: 105, name: 'HONDAの開発番長コウシ', nickname: 'HONDAの開発番長コウシ', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。ホンダで開発業務に従事。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_3.jpg' },
+                { id: 106, name: '華麗なる新人鈴木', nickname: '華麗なる新人鈴木', belt: 'white', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。華麗な技で魅せる新人ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_3.jpg' },
+                { id: 107, name: '体幹お兄さん直人', nickname: '体幹お兄さん直人', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。体幹トレーニングのエキスパート。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_4.jpg' },
+                { id: 108, name: 'インテリジェンステイクダウンリュウヒ', nickname: 'インテリジェンステイクダウンリュウヒ', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。知的なテイクダウンが得意。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_4.jpg' },
+                { id: 109, name: '練習２ポケ本番キングスタッキー', nickname: '練習２ポケ本番キングスタッキー', belt: 'white', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'Super Yawara Cup 個人戦出場者。本番で力を発揮するタイプ。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_5.jpg' },
+                
+                // ライト級上位選手
+                { id: 9, name: '松木 フェルナンド', nickname: '', belt: 'black', weight: 'light', dojo: 'FHR', wins: 0, losses: 0, bio: 'ライト級1位の黒帯チャンピオン。⭐️マーク付きの実力者。', achievements: '⭐️チャンピオン', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_10.jpg' },
+                { id: 10, name: '原田 大樹', nickname: '', belt: 'black', weight: 'light', dojo: 'FHR', wins: 0, losses: 0, bio: 'ライト級2位のFHR所属黒帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_10.jpg' },
+                { id: 11, name: '田邊 大吾', nickname: '', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライト級3位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_11.jpg' },
+                { id: 12, name: 'kentaroh Awata', nickname: '', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライト級4位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_12.jpg' },
+                { id: 13, name: '岡島 悠裕', nickname: 'スマイリー岡島', belt: 'blue', weight: 'light', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライト級5位。いつも笑顔のスマイリー岡島。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_6.jpg' },
+                
+                // フェザー級
+                { id: 19, name: 'Leander De Souza', nickname: 'Le', belt: 'purple', weight: 'feather', dojo: 'FHR', wins: 0, losses: 0, bio: 'フェザー級1位のFHR所属紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_14.jpg' },
+                { id: 20, name: '河野 裕也', nickname: '', belt: 'purple', weight: 'feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'フェザー級2位の紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_15.jpg' },
+                { id: 21, name: '中西 亮介', nickname: '', belt: 'blue', weight: 'feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'フェザー級3位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_18.jpg' },
+                { id: 22, name: '秋山 紳右衛門', nickname: '', belt: 'blue', weight: 'feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'フェザー級4位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_18.jpg' },
+                { id: 23, name: '武田 好史', nickname: '', belt: 'white', weight: 'feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'フェザー級5位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_18.jpg' },
+                
+                // ライトフェザー級
+                { id: 26, name: '野島 繁昭', nickname: '', belt: 'purple', weight: 'light-feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライトフェザー級1位の紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_16.jpg' },
+                { id: 27, name: '渡辺 晋', nickname: '', belt: 'blue', weight: 'light-feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライトフェザー級2位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_17.jpg' },
+                { id: 28, name: '西尾 健斗', nickname: '', belt: 'blue', weight: 'light-feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライトフェザー級3位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_21.jpg' },
+                { id: 29, name: 'シンヤ', nickname: '', belt: 'purple', weight: 'light-feather', dojo: 'FHR', wins: 0, losses: 0, bio: 'ライトフェザー級4位のFHR所属紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_8.jpg' },
+                { id: 30, name: '公文 卓馬', nickname: '', belt: 'purple', weight: 'light-feather', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ライトフェザー級5位の紫帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_19.jpg' },
+                
+                // ルースター級
+                { id: 37, name: '永塚 和寛', nickname: '永塚', belt: 'blue', weight: 'rooster', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ルースター級1位の青帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_13.jpg' },
+                { id: 38, name: '綿貫 智也', nickname: '綿貫', belt: 'white', weight: 'rooster', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ルースター級2位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_12.jpg' },
+                { id: 39, name: '小野 太暉', nickname: '', belt: 'white', weight: 'rooster', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ルースター級3位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_14.jpg' },
+                { id: 40, name: '馬場 祐次', nickname: '焼肉古今の司令塔ばばちゃん', belt: 'white', weight: 'rooster', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ルースター級4位。焼肉店「古今」を経営する柔術家。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_1.jpg' },
+                { id: 41, name: '松下 ともゆき', nickname: '松下', belt: 'white', weight: 'rooster', dojo: 'YAWARA柔術アカデミー', wins: 0, losses: 0, bio: 'ルースター級5位の白帯ファイター。', achievements: '-', style: '-', image: 'images/fighters/LINE_ALBUM_対戦カード_250606_15.jpg' }
+            ];
+            
+            // Load saved data from localStorage
+            const savedData = localStorage.getItem('fightersData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                parsedData.forEach(savedFighter => {
+                    const defaultFighter = fightersData.find(f => f.id === savedFighter.id);
+                    if (defaultFighter) {
+                        Object.assign(defaultFighter, savedFighter);
+                    }
+                });
+            }
+        }
+        
         // Fighter profile modal functionality
         function showFighterProfile(fighterName) {
-            // Find fighter by name
-            const fighter = fightersData.find(f => f.name === fighterName || f.nickname === fighterName);
-            if (!fighter) return;
+            console.log('Trying to show fighter profile for:', fighterName);
+            console.log('Available fighters:', fightersData.map(f => f.name));
             
+            // Find fighter by name or nickname
+            const fighter = fightersData.find(f => 
+                f.name === fighterName || 
+                f.nickname === fighterName ||
+                (f.nickname && f.nickname.includes(fighterName)) ||
+                fighterName.includes(f.name)
+            );
+            
+            if (!fighter) {
+                console.log('Fighter not found:', fighterName);
+                alert('選手が見つかりませんでした: ' + fighterName);
+                return;
+            }
+            
+            console.log('Found fighter:', fighter);
             showFighterProfileById(fighter.id);
         }
         
@@ -161,7 +243,12 @@
             
             const profileHtml = `
                 <div class="fighter-profile">
-                    <div class="profile-image"></div>
+                    <div class="profile-image">
+                        ${fighter.image ? 
+                            `<img src="${fighter.image}" alt="${fighter.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            (fighter.nickname || fighter.name).charAt(0)
+                        }
+                    </div>
                     <h2 class="profile-name">${fighter.nickname || fighter.name}</h2>
                     ${fighter.nickname ? `<p class="profile-real-name">${fighter.name}</p>` : ''}
                     <div class="profile-details">
@@ -207,10 +294,115 @@
             document.getElementById('fighter-modal').style.display = 'block';
         }
         
-        // Load saved fighter data
+        // Show edit form
+        function showEditForm(fighterId) {
+            const fighter = fightersData.find(f => f.id === fighterId);
+            if (!fighter) return;
+            
+            document.getElementById('fighter-modal').style.display = 'none';
+            document.getElementById('edit-modal').style.display = 'block';
+            
+            // Populate form
+            document.getElementById('edit-fighter-id').value = fighter.id;
+            document.getElementById('edit-full-name').value = fighter.fullName || fighter.name;
+            document.getElementById('edit-nickname').value = fighter.nickname || '';
+            document.getElementById('edit-age').value = fighter.age || '';
+            document.getElementById('edit-occupation').value = fighter.occupation || '';
+            document.getElementById('edit-location').value = fighter.location || '';
+            document.getElementById('edit-experience').value = fighter.experience || '';
+            document.getElementById('edit-specialty').value = fighter.specialty || '';
+            document.getElementById('edit-characteristic').value = fighter.characteristic || '';
+            document.getElementById('edit-motivation').value = fighter.motivation || '';
+        }
+        
+        // Handle edit form submission
+        function handleEditSubmit(e) {
+            e.preventDefault();
+            
+            const fighterId = parseInt(document.getElementById('edit-fighter-id').value);
+            const fighter = fightersData.find(f => f.id === fighterId);
+            
+            if (!fighter) return;
+            
+            // Update fighter data
+            fighter.fullName = document.getElementById('edit-full-name').value;
+            fighter.nickname = document.getElementById('edit-nickname').value;
+            fighter.age = document.getElementById('edit-age').value;
+            fighter.occupation = document.getElementById('edit-occupation').value;
+            fighter.location = document.getElementById('edit-location').value;
+            fighter.experience = document.getElementById('edit-experience').value;
+            fighter.specialty = document.getElementById('edit-specialty').value;
+            fighter.characteristic = document.getElementById('edit-characteristic').value;
+            fighter.motivation = document.getElementById('edit-motivation').value;
+            
+            // Save to localStorage
+            localStorage.setItem('fightersData', JSON.stringify(fightersData));
+            
+            // Close modal and show success
+            document.getElementById('edit-modal').style.display = 'none';
+            alert('プロフィールが更新されました！');
+            
+            // Show updated profile
+            showFighterProfileById(fighterId);
+        }
+        
+        // Helper functions
+        function getBeltName(belt) {
+            const beltNames = {
+                white: '白帯',
+                blue: '青帯',
+                purple: '紫帯',
+                brown: '茶帯',
+                black: '黒帯'
+            };
+            return beltNames[belt] || belt;
+        }
+        
+        function getWeightClassName(weight) {
+            const weightClassNames = {
+                'rooster': 'ルースター',
+                'light-feather': 'ライトフェザー',
+                'feather': 'フェザー',
+                'light': 'ライト',
+                'middle': 'ミドル',
+                'medium-heavy': 'ミディアムヘビー'
+            };
+            return weightClassNames[weight] || weight;
+        }
+        
+        // Initialize modal event listeners
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing...');
             loadFightersData();
-            loadSavedData();
+            console.log('Fighters data loaded:', fightersData.length, 'fighters');
+            
+            // Modal close buttons
+            document.querySelectorAll('.close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+            
+            // Close modal on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+            
+            // Edit form submit
+            const editForm = document.getElementById('edit-form');
+            if (editForm) {
+                editForm.addEventListener('submit', handleEditSubmit);
+            }
+            
+            // Cancel button
+            const cancelBtn = document.querySelector('.cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    document.getElementById('edit-modal').style.display = 'none';
+                });
+            }
         });
     </script>
     

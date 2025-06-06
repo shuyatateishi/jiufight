@@ -70,31 +70,6 @@
             background-color: #a01729;
         }
         
-        .password-back {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-        
-        .password-back:hover {
-            background-color: #5a6268;
-        }
-        
-        .password-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-direction: column;
-        }
-        
         .password-error {
             color: #d32f2f;
             margin-top: 1rem;
@@ -294,10 +269,7 @@
                        placeholder="パスワードを入力してください" 
                        required 
                        autocomplete="off">
-                <div class="password-buttons">
-                    <button type="submit" class="password-submit">ログイン</button>
-                    <a href="index.html" class="password-back">戻る</a>
-                </div>
+                <button type="submit" class="password-submit">ログイン</button>
                 <div class="password-error" id="password-error">パスワードが正しくありません</div>
             </form>
         </div>

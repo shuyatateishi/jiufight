@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像テスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .image-test { margin: 20px 0; }
+        .image-test img { max-width: 300px; height: auto; border: 2px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>画像表示テスト</h1>
+    
+    <div class="image-test">
+        <h3>画像1: 三木 善靖</h3>
+        <img src="images/fighters/LINE_ALBUM_対戦カード_250606_1.jpg" alt="画像1">
+    </div>
+    
+    <div class="image-test">
+        <h3>画像9: 松木 フェルナンド</h3>
+        <img src="images/fighters/LINE_ALBUM_対戦カード_250606_9.jpg" alt="画像9">
+    </div>
+    
+    <div class="image-test">
+        <h3>クリックテスト</h3>
+        <button onclick="testClick()">クリックテスト</button>
+    </div>
+    
+    <script>
+        function testClick() {
+            alert('クリック動作しました！');
+        }
+    </script>
+</body>
+</html>
