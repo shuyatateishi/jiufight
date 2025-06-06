@@ -13,7 +13,8 @@
       "Bash(npx vercel:*)",
       "Bash(pkill:*)",
       "Bash(mv:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }

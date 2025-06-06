@@ -1341,14 +1341,22 @@ function showFighterProfile(fighterId) {
 // Show edit form
 function showEditForm(fighterId) {
     const fighter = fightersData.find(f => f.id === fighterId);
-    if (!fighter) return;
+    if (!fighter) {
+        console.error(`Fighter with ID ${fighterId} not found`);
+        return;
+    }
+    
+    console.log(`Editing fighter: ${fighter.name} (ID: ${fighter.id})`);
     
     document.getElementById('fighter-modal').style.display = 'none';
     document.getElementById('edit-modal').style.display = 'block';
     
-    // Populate form
+    // Clear form first
+    document.getElementById('edit-form').reset();
+    
+    // Populate form with current data
     document.getElementById('edit-fighter-id').value = fighter.id;
-    document.getElementById('edit-full-name').value = fighter.fullName || fighter.name;
+    document.getElementById('edit-full-name').value = fighter.fullName || fighter.name || '';
     document.getElementById('edit-nickname').value = fighter.nickname || '';
     document.getElementById('edit-age').value = fighter.age || '';
     document.getElementById('edit-occupation').value = fighter.occupation || '';
@@ -1357,6 +1365,8 @@ function showEditForm(fighterId) {
     document.getElementById('edit-specialty').value = fighter.specialty || '';
     document.getElementById('edit-characteristic').value = fighter.characteristic || '';
     document.getElementById('edit-motivation').value = fighter.motivation || '';
+    
+    console.log('Edit form populated with fighter data');
 }
 
 // Handle edit form submission
@@ -1398,11 +1408,11 @@ function handleEditSubmit(e) {
     document.getElementById('edit-modal').style.display = 'none';
     displayFighters();
     
-    // Show success message
-    alert('プロフィールが更新されました！');
-    
-    // Show updated profile
-    showFighterProfile(fighterId);
+    // Show success message and updated profile
+    setTimeout(() => {
+        alert('プロフィールが更新されました！');
+        showFighterProfile(fighterId);
+    }, 500);
 }
 
 // Helper functions

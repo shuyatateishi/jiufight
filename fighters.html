@@ -249,22 +249,57 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Fighters page loaded');
             
-            // Check Firebase connection status
-            setTimeout(() => {
+            // Firebase接続の確認を少し遅らせる
+            const checkInterval = setInterval(() => {
                 if (window.databaseSync) {
+                    clearInterval(checkInterval);
                     console.log('✅ Database sync available');
                     const status = window.databaseSync.getSyncStatus();
                     console.log('📊 Sync status:', status);
                     
+                    // リスナーを登録
                     window.databaseSync.onFighterUpdate((updatedFightersData) => {
                         console.log(`🔄 Received fighter update: ${updatedFightersData.length} fighters`);
-                        fightersData = updatedFightersData;
-                        displayFighters();
+                        console.log('📍 Update received from:', window.databaseSync.deviceId);
+                        
+                        // グローバル変数を更新
+                        window.fightersData = updatedFightersData;
+                        
+                        // フィルタリングをリセット
+                        window.filteredFighters = [...updatedFightersData];
+                        
+                        // 現在のフィルター設定を再適用
+                        const searchInput = document.getElementById('search-input');
+                        const beltFilter = document.getElementById('belt-filter');
+                        const weightFilter = document.getElementById('weight-filter');
+                        
+                        if (searchInput && (searchInput.value || beltFilter.value || weightFilter.value)) {
+                            filterFighters();
+                        } else {
+                            displayFighters();
+                        }
+                        
+                        console.log('✅ Fighter display updated');
                     });
+                    
+                    // 強制的に最新データを取得
+                    console.log('🔄 Forcing initial sync check...');
+                    window.databaseSync.forceSync();
+                    
+                } else if (!window.firebase) {
+                    console.log('⏳ Waiting for Firebase to load...');
                 } else {
-                    console.log('❌ Database sync not available');
+                    console.log('⏳ Waiting for database sync to initialize...');
                 }
-            }, 1000);
+            }, 500);
+            
+            // 10秒後にタイムアウト
+            setTimeout(() => {
+                clearInterval(checkInterval);
+                if (!window.databaseSync) {
+                    console.error('❌ Database sync initialization timeout');
+                }
+            }, 10000);
         });
     </script>
 </body>

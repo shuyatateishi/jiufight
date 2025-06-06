@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Firebase 同期デバッグ - Jiufight</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .status-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+        .status-card.online {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .status-card.offline {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        .data-display {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Firebase 同期デバッグ</h1>
+            <p>リアルタイム同期の動作状況を詳細に監視します</p>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card" id="connection-status">
+                <h3>🔗 接続状態</h3>
+                <div id="connection-info">確認中...</div>
+            </div>
+            <div class="status-card" id="sync-status">
+                <h3>🔄 同期状態</h3>
+                <div id="sync-info">確認中...</div>
+            </div>
+            <div class="status-card">
+                <h3>📊 データ状態</h3>
+                <div id="data-info">確認中...</div>
+            </div>
+            <div class="status-card">
+                <h3>📱 デバイス情報</h3>
+                <div id="device-info">確認中...</div>
+            </div>
+        </div>
+
+        <div>
+            <h3>🧪 テスト操作</h3>
+            <button class="btn" onclick="testAddFighter()">テスト選手追加</button>
+            <button class="btn" onclick="testEditFighter()">テスト選手編集</button>
+            <button class="btn" onclick="forceSyncCheck()">強制同期チェック</button>
+            <button class="btn" onclick="clearLog()">ログクリア</button>
+            <button class="btn btn-danger" onclick="clearTestData()">テストデータ削除</button>
+        </div>
+
+        <div>
+            <h3>📝 リアルタイムログ</h3>
+            <div id="debug-log" class="log"></div>
+        </div>
+
+        <div>
+            <h3>💾 現在のデータ</h3>
+            <div id="current-data" class="data-display"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Database Sync System -->
+    <script src="database-sync.js"></script>
+
+    <script>
+        let debugLog = [];
+        let monitorInterval;
+
+        // Override console.log to capture logs
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        function captureLog(type, message, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message} ${args.join(' ')}`;
+            debugLog.push(logEntry);
+            updateLogDisplay();
+            
+            // Call original function
+            if (type === 'log') originalLog(message, ...args);
+            else if (type === 'warn') originalWarn(message, ...args);
+            else if (type === 'error') originalError(message, ...args);
+        }
+
+        console.log = (...args) => captureLog('log', ...args);
+        console.warn = (...args) => captureLog('warn', ...args);
+        console.error = (...args) => captureLog('error', ...args);
+
+        function updateLogDisplay() {
+            const logElement = document.getElementById('debug-log');
+            logElement.textContent = debugLog.slice(-50).join('\n');
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStatus() {
+            // Connection status
+            const connectionElement = document.getElementById('connection-info');
+            const connectionCard = document.getElementById('connection-status');
+            
+            if (typeof firebase === 'undefined') {
+                connectionElement.innerHTML = '❌ Firebase SDK 未読み込み';
+                connectionCard.className = 'status-card offline';
+            } else if (!window.firebaseDB) {
+                connectionElement.innerHTML = '⚠️ Firebase 未初期化';
+                connectionCard.className = 'status-card offline';
+            } else {
+                connectionElement.innerHTML = '✅ Firebase 接続中';
+                connectionCard.className = 'status-card online';
+            }
+
+            // Sync status
+            const syncElement = document.getElementById('sync-info');
+            const syncCard = document.getElementById('sync-status');
+            
+            if (window.databaseSync) {
+                const status = window.databaseSync.getSyncStatus();
+                syncElement.innerHTML = `
+                    状態: ${status.isOnline ? '✅ オンライン' : '❌ オフライン'}<br>
+                    データベース: ${status.hasDatabase ? '✅ 接続済み' : '❌ 未接続'}<br>
+                    選手数: ${status.localCache.fighters}人<br>
+                    キュー: ${status.syncQueue}件
+                `;
+                syncCard.className = status.isOnline && status.hasDatabase ? 'status-card online' : 'status-card offline';
+            } else {
+                syncElement.innerHTML = '❌ 同期システム未初期化';
+                syncCard.className = 'status-card offline';
+            }
+
+            // Data info
+            const dataElement = document.getElementById('data-info');
+            const localData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            dataElement.innerHTML = `
+                ローカル選手数: ${localData.length}人<br>
+                最終更新: ${localStorage.getItem('fightersData_timestamp') ? 
+                    new Date(parseInt(localStorage.getItem('fightersData_timestamp'))).toLocaleString() : '未更新'}
+            `;
+
+            // Device info
+            const deviceElement = document.getElementById('device-info');
+            if (window.databaseSync) {
+                const status = window.databaseSync.getSyncStatus();
+                deviceElement.innerHTML = `
+                    デバイスID: ${status.deviceId}<br>
+                    ブラウザ: ${navigator.userAgent.includes('Mobile') ? 'モバイル' : 'デスクトップ'}<br>
+                    画面幅: ${window.innerWidth}px
+                `;
+            }
+
+            // Current data display
+            const currentDataElement = document.getElementById('current-data');
+            currentDataElement.textContent = JSON.stringify(localData.slice(0, 3), null, 2);
+        }
+
+        function testAddFighter() {
+            console.log('🧪 テスト選手を追加中...');
+            
+            if (!window.databaseSync) {
+                console.error('❌ Database sync not available');
+                return;
+            }
+
+            const localData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            const testFighter = {
+                id: Date.now(),
+                name: `テスト選手_${Date.now()}`,
+                nickname: `デバッグ君_${new Date().getSeconds()}`,
+                belt: 'blue',
+                weight: 'light',
+                dojo: 'デバッグ道場',
+                wins: 999,
+                losses: 0,
+                bio: 'Firebase同期テスト用の選手',
+                fullName: `テスト太郎_${Date.now()}`,
+                age: '25',
+                testData: true
+            };
+
+            localData.push(testFighter);
+            console.log(`➕ テスト選手追加: ${testFighter.nickname}`);
+            
+            window.databaseSync.updateFighters(localData);
+        }
+
+        function testEditFighter() {
+            console.log('🧪 テスト選手を編集中...');
+            
+            const localData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            const testFighter = localData.find(f => f.testData);
+            
+            if (testFighter) {
+                testFighter.motivation = `編集テスト - ${new Date().toLocaleTimeString()}`;
+                testFighter.wins = testFighter.wins + 1;
+                console.log(`✏️ テスト選手編集: ${testFighter.nickname}`);
+                
+                window.databaseSync.updateFighters(localData);
+            } else {
+                console.warn('⚠️ テスト選手が見つかりません');
+            }
+        }
+
+        function forceSyncCheck() {
+            console.log('🔄 強制同期チェック実行...');
+            if (window.databaseSync) {
+                window.databaseSync.forceSync();
+            }
+        }
+
+        function clearTestData() {
+            console.log('🗑️ テストデータを削除...');
+            const localData = JSON.parse(localStorage.getItem('fightersData') || '[]');
+            const filteredData = localData.filter(f => !f.testData);
+            
+            if (filteredData.length < localData.length) {
+                window.databaseSync.updateFighters(filteredData);
+                console.log(`✅ ${localData.length - filteredData.length}件のテストデータを削除`);
+            } else {
+                console.log('ℹ️ テストデータが見つかりませんでした');
+            }
+        }
+
+        function clearLog() {
+            debugLog = [];
+            updateLogDisplay();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 デバッグページ開始');
+            
+            // Set up monitoring
+            monitorInterval = setInterval(updateStatus, 1000);
+            
+            // Set up sync callback
+            setTimeout(() => {
+                if (window.databaseSync) {
+                    window.databaseSync.onFighterUpdate((updatedData) => {
+                        console.log(`🔔 同期通知受信: ${updatedData.length}人の選手データ`);
+                        updateStatus();
+                    });
+                }
+            }, 2000);
+            
+            updateStatus();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (monitorInterval) {
+                clearInterval(monitorInterval);
+            }
+        });
+    </script>
+</body>
+</html>

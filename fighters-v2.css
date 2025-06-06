@@ -405,6 +405,7 @@ main {
     align-items: center;
     justify-content: center;
     padding: var(--space-lg);
+    box-sizing: border-box;
 }
 
 .modal-content {
@@ -597,14 +598,27 @@ main {
     
     .modal {
         padding: var(--space-md);
+        align-items: flex-start;
+        padding-top: 20px;
     }
     
     .modal-content {
         margin: 0;
         width: 100%;
         max-width: none;
-        max-height: 90vh;
+        max-height: 85vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .fighter-profile {
+        padding: var(--space-lg);
+    }
+    
+    .profile-image {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto var(--space-lg);
     }
     
     .form-group {

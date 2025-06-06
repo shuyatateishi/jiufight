@@ -3,295 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧪 リアルタイム同期テスト - Jiufight | 開発者用テスト画面</title>
-    <meta name="description" content="Jiufightのリアルタイム同期機能をテストするための開発者用画面">
-    <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+    <title>同期テスト - 端末A/B</title>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 20px;
-            background: #f5f5f5;
+            background-color: #f5f5f5;
         }
-        .test-container {
+        .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .test-section {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ddd;
             border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .test-result {
+        .status {
             padding: 10px;
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-weight: bold;
         }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .online { background-color: #d4edda; color: #155724; }
+        .offline { background-color: #f8d7da; color: #721c24; }
         button {
-            background: #007bff;
-            color: white;
-            border: none;
             padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
             margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
         }
-        button:hover { background: #0056b3; }
-        .log {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-warning { background-color: #ffc107; color: black; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .fighter-list {
+            margin-top: 20px;
             padding: 10px;
-            height: 200px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            max-height: 300px;
             overflow-y: auto;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
             font-family: monospace;
             font-size: 12px;
-            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .device-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <div class="test-container">
-        <h1>🧪 Jiufight リアルタイム同期テスト</h1>
+    <div class="container">
+        <h1>🔄 Jiufight 同期テスト</h1>
         
-        <div class="test-section">
-            <h2>📊 現在の状態</h2>
-            <div id="current-status" class="test-result info">
-                システムを読み込み中...
-            </div>
+        <div class="device-info">
+            <strong>デバイスID:</strong> <span id="device-id">読み込み中...</span><br>
+            <strong>接続状態:</strong> <span id="connection-status">確認中...</span>
         </div>
-        
-        <div class="test-section">
-            <h2>🔄 選手データ同期テスト</h2>
-            <p>このテストでは選手データの変更が正しく同期されるかを確認します。</p>
-            
-            <button onclick="testFighterUpdate()">テストデータで選手更新</button>
-            <button onclick="testCrossTabSync()">別タブ同期テスト</button>
-            <button onclick="testPersistence()">永続化テスト</button>
-            <button onclick="clearTestData()">テストデータクリア</button>
-            
-            <div id="fighter-test-results"></div>
+
+        <div id="status" class="status offline">
+            初期化中...
         </div>
-        
-        <div class="test-section">
-            <h2>📝 ログ</h2>
-            <div id="test-log" class="log"></div>
+
+        <div>
+            <h2>テスト操作</h2>
+            <button class="btn-primary" onclick="addTestFighter()">テスト選手を追加</button>
+            <button class="btn-success" onclick="editRandomFighter()">ランダムに選手を編集</button>
+            <button class="btn-warning" onclick="forceRefresh()">強制リフレッシュ</button>
+            <button class="btn-danger" onclick="clearAllData()">全データクリア</button>
         </div>
-        
-        <div class="test-section">
-            <h2>🔗 関連ページテスト</h2>
-            <p>これらのリンクを別タブで開いて、同期をテストしてください：</p>
-            <a href="fighters.html" target="_blank">選手一覧ページ</a> | 
-            <a href="rankings.html" target="_blank">ランキングページ</a>
+
+        <div class="fighter-list">
+            <h3>選手リスト (<span id="fighter-count">0</span>名)</h3>
+            <div id="fighters"></div>
+        </div>
+
+        <div class="log">
+            <h3>ログ</h3>
+            <div id="log"></div>
         </div>
     </div>
 
-    <script src="realtime-sync.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Database Sync System -->
+    <script src="database-sync.js"></script>
+
     <script>
-        let testLog = [];
-        
-        function log(message, type = 'info') {
+        let fightersData = [];
+        const logs = [];
+
+        function addLog(message) {
             const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            testLog.push(logEntry);
-            
-            const logElement = document.getElementById('test-log');
-            logElement.textContent = testLog.join('\n');
-            logElement.scrollTop = logElement.scrollHeight;
-            
-            console.log(logEntry);
+            logs.unshift(`[${timestamp}] ${message}`);
+            document.getElementById('log').innerHTML = logs.slice(0, 50).join('<br>');
         }
-        
-        function showResult(elementId, message, type) {
-            const element = document.getElementById(elementId);
-            element.className = `test-result ${type}`;
-            element.textContent = message;
+
+        function updateStatus(message, isOnline) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${isOnline ? 'online' : 'offline'}`;
         }
-        
-        // 初期状態チェック
-        function checkInitialStatus() {
-            log('システム初期化チェック開始');
+
+        function displayFighters() {
+            const fightersEl = document.getElementById('fighters');
+            const countEl = document.getElementById('fighter-count');
             
-            // localStorage確認
-            const fightersData = localStorage.getItem('fightersData');
-            const timestamp = localStorage.getItem('fightersData_timestamp');
+            countEl.textContent = fightersData.length;
             
-            if (fightersData) {
-                const data = JSON.parse(fightersData);
-                log(`選手データ発見: ${data.length}人の選手`);
-                showResult('current-status', `✅ ${data.length}人の選手データが保存されています (最終更新: ${timestamp ? new Date(parseInt(timestamp)).toLocaleString() : '不明'})`, 'success');
-            } else {
-                log('選手データが見つかりません');
-                showResult('current-status', '⚠️ 選手データが保存されていません', 'error');
+            if (fightersData.length === 0) {
+                fightersEl.innerHTML = '<p>選手データがありません</p>';
+                return;
             }
-            
-            // リアルタイム同期システム確認
-            if (window.realtimeSync) {
-                log('リアルタイム同期システム: 利用可能');
-                
-                // コールバック登録
-                window.realtimeSync.onFighterUpdate((updatedData) => {
-                    log(`🔄 リアルタイム更新検出: ${updatedData.length}人の選手データ`);
-                    showResult('fighter-test-results', `🔄 リアルタイム更新を受信しました (${updatedData.length}人)`, 'success');
-                });
-            } else {
-                log('❌ リアルタイム同期システムが利用できません');
-                showResult('current-status', '❌ リアルタイム同期システムエラー', 'error');
-            }
+
+            // 最新5名を表示
+            const latest = fightersData.slice(-5).reverse();
+            fightersEl.innerHTML = latest.map(f => `
+                <div style="padding: 5px; border-bottom: 1px solid #ddd;">
+                    <strong>${f.name}</strong> (${f.belt}帯, ${f.weight}級)
+                    ${f.testTimestamp ? `<br><small>更新: ${new Date(f.testTimestamp).toLocaleString()}</small>` : ''}
+                    ${f.testDevice ? `<br><small>端末: ${f.testDevice.slice(-6)}</small>` : ''}
+                </div>
+            `).join('');
         }
-        
-        // 選手データ更新テスト
-        function testFighterUpdate() {
-            log('選手データ更新テスト開始');
-            
-            const testFighter = {
-                id: 9999,
-                name: 'テスト選手',
-                nickname: 'テストファイター',
-                belt: 'black',
-                weight: 'test',
+
+        function addTestFighter() {
+            const testName = `テスト選手_${Date.now()}`;
+            const newFighter = {
+                id: Date.now(),
+                name: testName,
+                nickname: '',
+                belt: ['white', 'blue', 'purple', 'brown', 'black'][Math.floor(Math.random() * 5)],
+                weight: ['rooster', 'light-feather', 'feather', 'light', 'middle'][Math.floor(Math.random() * 5)],
                 dojo: 'テスト道場',
-                wins: 999,
+                wins: 0,
                 losses: 0,
-                bio: 'リアルタイム同期テスト用の選手データです',
-                fullName: 'テスト太郎',
-                age: '25',
-                occupation: 'テスター',
-                location: 'テスト県',
-                experience: 'テスト歴10年',
-                specialty: 'テスト技',
-                characteristic: 'いつもテストしてる',
-                motivation: 'テストに勝ちたい！',
-                lastUpdated: new Date().toISOString()
+                bio: 'テスト用の選手データ',
+                achievements: '-',
+                style: '-',
+                matchHistory: [],
+                testTimestamp: new Date().toISOString(),
+                testDevice: window.databaseSync ? window.databaseSync.deviceId : 'unknown'
             };
+
+            fightersData.push(newFighter);
             
-            // 既存データ取得
-            let fightersData = [];
-            const existingData = localStorage.getItem('fightersData');
-            if (existingData) {
-                fightersData = JSON.parse(existingData);
-            }
-            
-            // テスト選手を追加/更新
-            const existingIndex = fightersData.findIndex(f => f.id === 9999);
-            if (existingIndex >= 0) {
-                fightersData[existingIndex] = testFighter;
-                log('テスト選手データを更新');
+            if (window.databaseSync) {
+                addLog(`選手追加中: ${testName}`);
+                window.databaseSync.updateFighters(fightersData);
             } else {
-                fightersData.push(testFighter);
-                log('テスト選手データを追加');
-            }
-            
-            // リアルタイム同期で保存
-            if (window.realtimeSync) {
-                window.realtimeSync.updateFighters(fightersData);
-                log('✅ リアルタイム同期システムで更新完了');
-                showResult('fighter-test-results', '✅ テスト選手データを更新しました', 'success');
-            } else {
-                localStorage.setItem('fightersData', JSON.stringify(fightersData));
-                log('⚠️ フォールバック: localStorage直接保存');
-                showResult('fighter-test-results', '⚠️ フォールバック保存しました', 'info');
+                addLog('エラー: 同期システムが利用できません');
             }
         }
-        
-        // 別タブ同期テスト
-        function testCrossTabSync() {
-            log('別タブ同期テスト開始');
-            showResult('fighter-test-results', '🔄 別タブを開いて同期をテストしてください...', 'info');
+
+        function editRandomFighter() {
+            if (fightersData.length === 0) {
+                addLog('編集する選手がいません');
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * fightersData.length);
+            const fighter = fightersData[randomIndex];
             
-            // 選手一覧とランキングページを開く
-            window.open('fighters.html', '_blank');
-            window.open('rankings.html', '_blank');
-            
-            log('選手一覧ページとランキングページを新しいタブで開きました');
-            log('各ページでテスト選手（ID: 9999）のプロフィールを編集してみてください');
+            fighter.wins = (fighter.wins || 0) + 1;
+            fighter.testTimestamp = new Date().toISOString();
+            fighter.testDevice = window.databaseSync ? window.databaseSync.deviceId : 'unknown';
+            fighter.lastEdit = `編集時刻: ${new Date().toLocaleString()}`;
+
+            if (window.databaseSync) {
+                addLog(`選手編集中: ${fighter.name} (勝利数: ${fighter.wins})`);
+                window.databaseSync.updateFighters(fightersData);
+            }
         }
-        
-        // 永続化テスト
-        function testPersistence() {
-            log('永続化テスト開始');
-            
-            const timestamp = localStorage.getItem('fightersData_timestamp');
-            if (timestamp) {
-                const lastUpdate = new Date(parseInt(timestamp));
-                const now = new Date();
-                const timeDiff = now - lastUpdate;
-                
-                log(`最終更新: ${lastUpdate.toLocaleString()}`);
-                log(`経過時間: ${Math.round(timeDiff / 1000)}秒`);
-                
-                if (timeDiff > 30000) { // 30秒以上前
-                    showResult('fighter-test-results', `✅ データが${Math.round(timeDiff / 1000)}秒間永続化されています`, 'success');
-                } else {
-                    showResult('fighter-test-results', `📊 データ保存から${Math.round(timeDiff / 1000)}秒経過`, 'info');
+
+        function forceRefresh() {
+            if (window.databaseSync) {
+                addLog('強制リフレッシュ実行中...');
+                window.databaseSync.forceSync();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('本当に全データをクリアしますか？')) {
+                fightersData = [];
+                if (window.databaseSync) {
+                    window.databaseSync.updateFighters(fightersData);
                 }
-            } else {
-                showResult('fighter-test-results', '❌ 永続化データが見つかりません', 'error');
-                log('永続化データのタイムスタンプが見つかりません');
-            }
-            
-            // ページリロードテスト提案
-            setTimeout(() => {
-                if (confirm('ページをリロードして永続化をテストしますか？')) {
-                    location.reload();
-                }
-            }, 1000);
-        }
-        
-        // テストデータクリア
-        function clearTestData() {
-            log('テストデータクリア開始');
-            
-            let fightersData = [];
-            const existingData = localStorage.getItem('fightersData');
-            if (existingData) {
-                fightersData = JSON.parse(existingData);
-                
-                // テスト選手削除
-                fightersData = fightersData.filter(f => f.id !== 9999);
-                
-                if (window.realtimeSync) {
-                    window.realtimeSync.updateFighters(fightersData);
-                    log('✅ テスト選手データを削除（リアルタイム同期）');
-                } else {
-                    localStorage.setItem('fightersData', JSON.stringify(fightersData));
-                    log('✅ テスト選手データを削除（localStorage）');
-                }
-                
-                showResult('fighter-test-results', '✅ テストデータをクリアしました', 'success');
-            } else {
-                log('クリアするデータが見つかりません');
-                showResult('fighter-test-results', 'ℹ️ クリアするデータがありません', 'info');
+                localStorage.clear();
+                addLog('全データをクリアしました');
+                displayFighters();
             }
         }
-        
+
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
-            log('テストページを初期化しています...');
-            setTimeout(checkInitialStatus, 500);
-        });
-        
-        // 定期的な状態監視
-        setInterval(() => {
-            const timestamp = localStorage.getItem('fightersData_timestamp');
-            if (timestamp) {
-                const lastUpdate = new Date(parseInt(timestamp));
-                const status = document.getElementById('current-status');
-                if (status && status.textContent.includes('選手データが保存されています')) {
-                    const data = JSON.parse(localStorage.getItem('fightersData') || '[]');
-                    status.textContent = `✅ ${data.length}人の選手データが保存されています (最終更新: ${lastUpdate.toLocaleString()})`;
+            addLog('ページ読み込み完了');
+
+            const checkInterval = setInterval(() => {
+                if (window.databaseSync) {
+                    clearInterval(checkInterval);
+                    
+                    const status = window.databaseSync.getSyncStatus();
+                    document.getElementById('device-id').textContent = status.deviceId;
+                    document.getElementById('connection-status').textContent = status.isOnline ? '🟢 オンライン' : '🔴 オフライン';
+                    
+                    updateStatus(status.isOnline ? 'Firebase接続済み' : 'オフラインモード', status.isOnline);
+                    addLog('同期システム初期化完了');
+
+                    // リスナー登録
+                    window.databaseSync.onFighterUpdate((data) => {
+                        addLog(`データ更新受信: ${data.length}名`);
+                        fightersData = data;
+                        displayFighters();
+                    });
+
+                    // 初期データ読み込み
+                    const savedData = localStorage.getItem('fightersData');
+                    if (savedData) {
+                        fightersData = JSON.parse(savedData);
+                        displayFighters();
+                        addLog(`ローカルデータ読み込み: ${fightersData.length}名`);
+                    }
                 }
-            }
-        }, 5000);
+            }, 500);
+
+            // 接続状態の監視
+            setInterval(() => {
+                if (window.databaseSync) {
+                    const status = window.databaseSync.getSyncStatus();
+                    document.getElementById('connection-status').textContent = status.isOnline ? '🟢 オンライン' : '🔴 オフライン';
+                }
+            }, 5000);
+        });
     </script>
 </body>
 </html>
