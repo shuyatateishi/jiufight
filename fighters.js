@@ -1467,10 +1467,10 @@ function handleEditSubmit(e) {
         // Force refresh display
         displayFighters();
         
-        // Show success and updated profile
+        // Show success message only
         setTimeout(() => {
             alert(`✅ ${fighter.name}のプロフィールが正常に更新されました！`);
-            showFighterProfile(fighterId);
+            // DON'T auto-open profile again - user can click manually if needed
         }, 300);
         
     } catch (error) {
